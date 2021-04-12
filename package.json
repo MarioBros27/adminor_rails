@@ -1,0 +1,27 @@
+{
+  "name": "rails-tickets",
+  "private": true,
+  "dependencies": {
+    "@babel/preset-react": "^7.13.13",
+    "@date-io/date-fns": "1.x",
+    "@material-ui/core": "^4.11.3",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/pickers": "^3.3.10",
+    "@material-ui/styles": "^4.11.3",
+    "@rails/actioncable": "^6.0.0",
+    "@rails/activestorage": "^6.0.0",
+    "@rails/ujs": "^6.0.0",
+    "@rails/webpacker": "5.2.1",
+    "axios": "^0.21.1",
+    "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
+    "date-fns": "^2.20.1",
+    "prop-types": "^15.7.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "turbolinks": "^5.2.0"
+  },
+  "version": "0.1.0",
+  "devDependencies": {
+    "webpack-dev-server": "^3.11.2"
+  }
+}
