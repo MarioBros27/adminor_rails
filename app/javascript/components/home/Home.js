@@ -10,6 +10,7 @@ import Button from '@material-ui/core/Button'
 import Hidden from '@material-ui/core/Hidden';
 
 import { Typography } from '@material-ui/core';
+import axios from 'axios'
 
 const LogInButton = withStyles({
     root: {
@@ -62,7 +63,27 @@ export default function Home(props) {
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
     const [signUp, setSignUp] = useState(false)
+    
+    const handleSubmit = function(){
+        console.log(email)
+        console.log(password)
+        console.log(confirmPassword)
+        axios.post('http://localhost:3000/registrations',{
+            user:{
+                email: email,
+                password: password,
+                password_confirmation: confirmPassword
+            }
+        },
+            {withCredentials: true}
+        ).then(response =>{
+            console.log("registration response",response)
+        }).catch(error=>{
+            console.log("registration error", error)
+        })
+        // event.preventDefault();
 
+    }
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
@@ -132,7 +153,7 @@ export default function Home(props) {
 
                         </Grid>
                         <Grid item>
-                            <SignUpButton onClick={() => { setSignUp(true) }}>Sign up</SignUpButton>
+                            <SignUpButton onClick={() => { if(signUp){handleSubmit()}else{setSignUp(true)} }}>Sign up</SignUpButton>
 
                         </Grid>
                     </Grid>

@@ -6,14 +6,18 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route ,Switch} from 'react-router-dom';
 import Home from '../components/home/Home'
+import Workspace from '../components/workspace/Workspace'
 
 document.addEventListener('DOMContentLoaded', () => {
   ReactDOM.render(
-      <Router>
-          <Route path="/" component={Home}/>   
-      </Router>, 
-      document.body.appendChild(document.createElement('div')),
+    <Router>
+      <Switch>
+        <Route exact path="/" component={Home} />
+        <Route exact path="/workspace" component={Workspace} />
+      </Switch>
+    </Router>,
+    document.body.appendChild(document.createElement('div')),
   );
 });
