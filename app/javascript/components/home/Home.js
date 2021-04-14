@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid'
 import useMediaQuery from '@material-ui/core/useMediaQuery';
@@ -47,6 +47,9 @@ const SignUpButton = withStyles({
     }
 })(Button);
 export default function Home(props) {
+    
+
+    console.log("logged in home?", props.loggedIn)
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
     const theme = React.useMemo(
         () =>
@@ -63,27 +66,59 @@ export default function Home(props) {
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
     const [signUp, setSignUp] = useState(false)
-    
-    const handleSubmit = function(){
+
+    const handleSuccesfulAuth = (data) => {
+        props.handleLogin(data)
+        props.history.push("/workspace")
+    }
+
+    const handleSubmit = function () {
         console.log(email)
         console.log(password)
         console.log(confirmPassword)
-        axios.post('http://localhost:3000/registrations',{
-            user:{
+        axios.post('http://localhost:3000/registrations', {
+            user: {
                 email: email,
                 password: password,
                 password_confirmation: confirmPassword
             }
         },
-            {withCredentials: true}
-        ).then(response =>{
-            console.log("registration response",response)
-        }).catch(error=>{
+            { withCredentials: true }
+        ).then(response => {
+            if (response.data.status === "created") {
+                console.log("hurray")
+                handleSuccesfulAuth(response.data)
+            }
+            console.log("registration response", response)
+        }).catch(error => {
             console.log("registration error", error)
         })
         // event.preventDefault();
 
     }
+
+    const handleSignInButtonPressed = ()=>{
+        console.log(email)
+        console.log(password)
+        axios.post('http://localhost:3000/sessions', {
+            user: {
+                email: email,
+                password: password
+            }
+        },
+            { withCredentials: true }
+        ).then(response => {
+            if (response.data.logged_in) {
+                console.log("hurray")
+                handleSuccesfulAuth(response.data)
+            }
+            console.log("Login response", response)
+        }).catch(error => {
+            console.log("Login error", error)
+        })
+    }
+
+
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
@@ -149,11 +184,11 @@ export default function Home(props) {
                     }
                     <Grid item container justify="space-evenly">
                         <Grid item>
-                            <LogInButton>Log in</LogInButton>
+                            <LogInButton onClick={()=>handleSignInButtonPressed()}>Log in</LogInButton>
 
                         </Grid>
                         <Grid item>
-                            <SignUpButton onClick={() => { if(signUp){handleSubmit()}else{setSignUp(true)} }}>Sign up</SignUpButton>
+                            <SignUpButton onClick={() => { if (signUp) { handleSubmit() } else { setSignUp(true) } }}>Sign up</SignUpButton>
 
                         </Grid>
                     </Grid>

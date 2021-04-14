@@ -1,6 +1,6 @@
 
 import { makeStyles } from '@material-ui/core/styles';
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import { Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button'
 import { withStyles } from '@material-ui/core/styles';
@@ -30,7 +30,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import TasksList from './TasksList'
 import DatePicker from './DatePicker'
-
+import axios from 'axios'
 
 const drawerWidth = 240;
 let taskToDelete = -1
@@ -171,6 +171,7 @@ const AddButton = withStyles({
     }
 })(Button);
 export default function Workspace(props) {
+    
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
     const theme = React.useMemo(
         () =>
@@ -271,7 +272,7 @@ export default function Workspace(props) {
     const handleDrawerClose = () => {
         setOpen(false);
     };
-
+    console.log("login state workspace", props.loggedIn)
     const [notDone, setNotDone] = useState(tasks)//Objects
     const [done, setDone] = useState(done_tasks)//Objects
     const [deleteTask, setDeleteTask] = useState(false)//Dialog delete task boolean
@@ -285,6 +286,13 @@ export default function Workspace(props) {
     const [currentTask, setCurrentTask] = useState({})//Selected task object that will be modified
 
     const [selectedDate, setSelectedDate] = useState(new Date());
+
+    const handleLogoutButtonPressed = () => {
+        axios.delete("http://localhost:3000/logout", { withCredentials: true }).then(response => {
+            props.handleLogout()
+        })
+
+    }
     //Functino to change the task status
     const changeTaskStatus = function (value, id) {
         //If value is true it means that a not done is changed to done. If else the opposite
@@ -336,8 +344,8 @@ export default function Workspace(props) {
     };
     const handleDeleteTask = () => {
         //Delete from wherever it is try not done and done
-        setNotDone(notDone.filter(el=> el.id !== taskToDelete))
-        setDone(done.filter(el=> el.id !== taskToDelete))
+        setNotDone(notDone.filter(el => el.id !== taskToDelete))
+        setDone(done.filter(el => el.id !== taskToDelete))
         setDeleteTask(false);
     };
     //Delete Project DIalog
@@ -449,8 +457,8 @@ export default function Workspace(props) {
             //TODO make a variable save the selected task when editTask() is called
             //Done it's called currentTask
             //Delete from wherever it is try not done and done
-            setNotDone(notDone.filter(el=> el.id !== setCurrentTask.id))
-            setDone(done.filter(el=> el.id !== setCurrentTask.id))
+            setNotDone(notDone.filter(el => el.id !== setCurrentTask.id))
+            setDone(done.filter(el => el.id !== setCurrentTask.id))
             //Push it to not added
             currentTask['due_date'] = newDate
             if (taskTitle !== '') {
@@ -536,7 +544,7 @@ export default function Workspace(props) {
                 </List>
                 <Divider />
                 <StyledAddButton onClick={() => handleOpenNewProject()}>Add new project</StyledAddButton>
-                <LogOutButton>Log Out</LogOutButton>
+                <LogOutButton onClick={() => handleLogoutButtonPressed()}>Log Out</LogOutButton>
             </Drawer>
             <main
                 className={clsx(classes.content, {
