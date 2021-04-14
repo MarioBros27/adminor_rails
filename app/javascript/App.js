@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import Home from './components/home/Home'
@@ -13,40 +13,41 @@ export default function App(props) {
     // const handleSuccesfulAuth = (data)=>{
     //     props.history.push("/workspace")
     // }
-    const handleLogin = (data)=>{
+    const handleLogin = (data) => {
         setLoggedIn(true)
         setUser(data.user)
     }
-    const handleLogout = ()=>{
+    const handleLogout = () => {
         setLoggedIn(false)
         setUser({})
     }
-    const checkLoginStatus = ()=>{
-        axios.get("http://localhost:3000/logged_in", {witchCredentials: true}).then(response=>{
-            if(response.data.logged_in && !loggedIn){
+    
+    const checkLoginStatus = () => {
+        axios.get("http://localhost:3000/logged_in", { witchCredentials: true }).then(response => {
+            if (response.data.logged_in && !loggedIn) {
                 setLoggedIn(true)
                 setUser(response.user)
                 props.history.push("/workspace")
-            }else if(!response.data.logged_in && loggedIn){
+            } else if (!response.data.logged_in && loggedIn) {
                 setLoggedIn(false)
                 setUser({})
             }
             console.log(response.data)
         })
     }
-    useEffect(()=>checkLoginStatus(),[])
+    useEffect(() => checkLoginStatus(), [])
     return (
         <Router>
             <Switch>
-                <Route exact path="/" render={ (props)=>
+                <Route exact path="/" render={(props) =>
                     loggedIn ? (
-                        <Redirect exact to="/workspace"/>
+                        <Redirect exact to="/workspace" />
                     ) : (
-                    <Home  {...props} handleLogin={handleLogin} loggedIn={loggedIn} />)
-            } />
-                <Route exact path="/workspace" render={ (props)=>
-                    loggedIn ? (<Workspace {...props} handleLogout={handleLogout} loggedIn={loggedIn} />):(
-                    <Redirect to="/"/>)
+                        <Home  {...props} handleLogin={handleLogin} loggedIn={loggedIn} />)
+                } />
+                <Route exact path="/workspace" render={(props) =>
+                    loggedIn ? (<Workspace {...props} handleLogout={handleLogout} loggedIn={loggedIn} />) : (
+                        <Redirect to="/" />)
                 } />
                 <Route component={Error}></Route>
             </Switch>

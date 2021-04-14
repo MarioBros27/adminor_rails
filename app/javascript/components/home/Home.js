@@ -8,6 +8,9 @@ import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button'
 
 import Hidden from '@material-ui/core/Hidden';
+import GoogleLogin from 'react-google-login';
+
+
 
 import { Typography } from '@material-ui/core';
 import axios from 'axios'
@@ -47,7 +50,7 @@ const SignUpButton = withStyles({
     }
 })(Button);
 export default function Home(props) {
-    
+
 
     console.log("logged in home?", props.loggedIn)
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -80,7 +83,8 @@ export default function Home(props) {
             user: {
                 email: email,
                 password: password,
-                password_confirmation: confirmPassword
+                password_confirmation: confirmPassword,
+                is_google: false
             }
         },
             { withCredentials: true }
@@ -97,7 +101,7 @@ export default function Home(props) {
 
     }
 
-    const handleSignInButtonPressed = ()=>{
+    const handleSignInButtonPressed = () => {
         console.log(email)
         console.log(password)
         axios.post('http://localhost:3000/sessions', {
@@ -117,7 +121,51 @@ export default function Home(props) {
             console.log("Login error", error)
         })
     }
+    const handleGoogleLogin = (data) => {
+        console.log(data.profileObj.email)
+        const email = data.profileObj.email
+        //Try to log in, if it's an error try to create, if there's an error you fucked up with syntax cause it doesn't exist
+        //Actually there's no syntax error here just if there's an error it doesn't exist
+        //BBUUUT we need to handle when you are logging in normally with a google kind email
+        //And handle what if they type wrong email, wrong password, etc
+        axios.post('http://localhost:3000/sessions', {
+            user: {
+                email: email,
+                is_google: true
+            }
+        },
+            { withCredentials: true }
+        ).then(response => {
+            if (response.data.logged_in) {
+                console.log("hurray google login")
+                handleSuccesfulAuth(response.data)
+            }
+            console.log("Login google response", response)
+        }).catch(error => {
+            if (error.response.status === 404) { ///THen create the account
+                axios.post('http://localhost:3000/registrations', {
+                    user: {
+                        email: email,
+                        is_google: true
+                    }
+                },
+                    { withCredentials: true }
+                ).then(response => {
+                    if (response.data.status === "created") {
 
+                        handleSuccesfulAuth(response.data)
+                    }
+                }).catch(error => {
+                    console.log("registration error", error)//Let know that something weird went wrong
+                })
+            } else {//something else happened and tell user to check something else
+
+            }
+        })
+    }
+    const handleGoogleLogInFailure = ()=>{
+        //TODO notify there was a damn error when trying to Log in with google
+    }
 
     return (
         <ThemeProvider theme={theme}>
@@ -137,7 +185,16 @@ export default function Home(props) {
                     <Typography variant='h1'>Adminor</Typography>
                     <Grid item container justify="center">
                         <Grid item>
-                            <LogInGoogleButton>Log in with Google</LogInGoogleButton>
+                            <GoogleLogin
+                                clientId="351611436819-32uve5bdc2i7tlk76cf59552p2s7chuj.apps.googleusercontent.com"
+                                render={renderProps => (
+                                    <LogInGoogleButton onClick={renderProps.onClick} disabled={renderProps.disabled} >Log in with Google</LogInGoogleButton>
+
+                                )}
+                                onSuccess={handleGoogleLogin}
+                                onFailure={handleGoogleLogInFailure}
+                                cookiePolicy={'single_host_origin'}
+                            />
 
                         </Grid>
 
@@ -184,7 +241,7 @@ export default function Home(props) {
                     }
                     <Grid item container justify="space-evenly">
                         <Grid item>
-                            <LogInButton onClick={()=>handleSignInButtonPressed()}>Log in</LogInButton>
+                            <LogInButton onClick={() => handleSignInButtonPressed()}>Log in</LogInButton>
 
                         </Grid>
                         <Grid item>

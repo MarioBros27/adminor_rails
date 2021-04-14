@@ -2,7 +2,8 @@ source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.6.3'
-
+###TODO disable this shit before production
+# gem 'rack-cors'
 #IMMPORRRTANT TO ADD BCRYPT FOR ENCRYPTING PASSWORDS
 gem 'bcrypt', '~> 3.1', '>= 3.1.12'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails', branch: 'main'

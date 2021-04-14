@@ -18,5 +18,15 @@ module RailsTickets
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    #THIs is so that it allows access from different port or server
+    #disable before production
+    # config.middleware.insert_before 0, Rack::Cors do
+    #   allow do
+    #     origins '*'
+    #     resource '*', :headers => :any, :methods => [:get, :post ,:create,:delete,:options]
+    #   end
+    # end
+
   end
 end

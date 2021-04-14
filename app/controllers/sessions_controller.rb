@@ -8,7 +8,11 @@ def create
             if not user 
                 return head 404
             else 
-                user = user.try(:authenticate, params["user"]["password"])
+                if params["user"]["is_google"]
+                    user = user.try(:authenticate, "jNJKNJANSJNDJNnanjak1891h28")
+                else
+                    user = user.try(:authenticate, params["user"]["password"])
+                end
             end
     
     if user 
