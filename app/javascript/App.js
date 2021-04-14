@@ -9,10 +9,7 @@ import axios from 'axios'
 export default function App(props) {
     const [loggedIn, setLoggedIn] = useState(false)
     const [user, setUser] = useState({})
-    console.log(loggedIn)
-    // const handleSuccesfulAuth = (data)=>{
-    //     props.history.push("/workspace")
-    // }
+    
     const handleLogin = (data) => {
         setLoggedIn(true)
         setUser(data.user)
@@ -32,7 +29,6 @@ export default function App(props) {
                 setLoggedIn(false)
                 setUser({})
             }
-            console.log(response.data)
         })
     }
     useEffect(() => checkLoginStatus(), [])

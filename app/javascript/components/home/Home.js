@@ -15,6 +15,7 @@ import GoogleLogin from 'react-google-login';
 import { Typography } from '@material-ui/core';
 import axios from 'axios'
 
+
 const LogInButton = withStyles({
     root: {
         //   background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
@@ -51,8 +52,6 @@ const SignUpButton = withStyles({
 })(Button);
 export default function Home(props) {
 
-
-    console.log("logged in home?", props.loggedIn)
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
     const theme = React.useMemo(
         () =>
@@ -69,6 +68,7 @@ export default function Home(props) {
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
     const [signUp, setSignUp] = useState(false)
+    const [error, setError] = useState("")
 
     const handleSuccesfulAuth = (data) => {
         props.handleLogin(data)
@@ -76,9 +76,22 @@ export default function Home(props) {
     }
 
     const handleSubmit = function () {
-        console.log(email)
-        console.log(password)
-        console.log(confirmPassword)
+        if(email === ""){
+            setError("Please enter an email")
+            return
+        }
+        if(password === ""){
+            setError("Please enter a password")
+            return
+        }
+        if(confirmPassword ===""){
+            setError("Please confirm password")
+            return
+        }
+        if(password !== confirmPassword){
+            setError("Passwords don't match")
+            return
+        }
         axios.post('http://localhost:3000/registrations', {
             user: {
                 email: email,
@@ -90,20 +103,24 @@ export default function Home(props) {
             { withCredentials: true }
         ).then(response => {
             if (response.data.status === "created") {
-                console.log("hurray")
                 handleSuccesfulAuth(response.data)
             }
-            console.log("registration response", response)
         }).catch(error => {
-            console.log("registration error", error)
+            setError("Try a different e-mail or username")
         })
         // event.preventDefault();
 
     }
 
     const handleSignInButtonPressed = () => {
-        console.log(email)
-        console.log(password)
+        if(email === ""){
+            setError("Please enter an email")
+            return
+        }
+        if(password == ""){
+            setError("please enter a password")
+            return
+        }
         axios.post('http://localhost:3000/sessions', {
             user: {
                 email: email,
@@ -113,21 +130,15 @@ export default function Home(props) {
             { withCredentials: true }
         ).then(response => {
             if (response.data.logged_in) {
-                console.log("hurray")
                 handleSuccesfulAuth(response.data)
             }
-            console.log("Login response", response)
         }).catch(error => {
-            console.log("Login error", error)
+            setError("Wrong user or password")
         })
     }
     const handleGoogleLogin = (data) => {
-        console.log(data.profileObj.email)
         const email = data.profileObj.email
-        //Try to log in, if it's an error try to create, if there's an error you fucked up with syntax cause it doesn't exist
-        //Actually there's no syntax error here just if there's an error it doesn't exist
-        //BBUUUT we need to handle when you are logging in normally with a google kind email
-        //And handle what if they type wrong email, wrong password, etc
+
         axios.post('http://localhost:3000/sessions', {
             user: {
                 email: email,
@@ -137,10 +148,8 @@ export default function Home(props) {
             { withCredentials: true }
         ).then(response => {
             if (response.data.logged_in) {
-                console.log("hurray google login")
                 handleSuccesfulAuth(response.data)
             }
-            console.log("Login google response", response)
         }).catch(error => {
             if (error.response.status === 404) { ///THen create the account
                 axios.post('http://localhost:3000/registrations', {
@@ -156,15 +165,15 @@ export default function Home(props) {
                         handleSuccesfulAuth(response.data)
                     }
                 }).catch(error => {
-                    console.log("registration error", error)//Let know that something weird went wrong
+                    setError("Something went wrong while trying to sign in with Google, try again")
                 })
             } else {//something else happened and tell user to check something else
-
+                setError("Ooops something went wrong, please try again or contact us")
             }
         })
     }
     const handleGoogleLogInFailure = ()=>{
-        //TODO notify there was a damn error when trying to Log in with google
+        setError("Something failed while trying to sign in with Google, try again")
     }
 
     return (
@@ -188,7 +197,7 @@ export default function Home(props) {
                             <GoogleLogin
                                 clientId="351611436819-32uve5bdc2i7tlk76cf59552p2s7chuj.apps.googleusercontent.com"
                                 render={renderProps => (
-                                    <LogInGoogleButton onClick={renderProps.onClick} disabled={renderProps.disabled} >Log in with Google</LogInGoogleButton>
+                                    <LogInGoogleButton onClick={renderProps.onClick}  disabled={renderProps.disabled} >Sign in with Google</LogInGoogleButton>
 
                                 )}
                                 onSuccess={handleGoogleLogin}
@@ -202,7 +211,7 @@ export default function Home(props) {
                     <Grid item container justify="center" style={{ width: '100%' }}>
                         <TextField
                             id="txt-username"
-                            label="e-mail"
+                            label="E-mail / Username"
                             variant="outlined"
                             inputProps={{ maxLength: 80 }}
                             color="primary"
@@ -224,6 +233,7 @@ export default function Home(props) {
                             onChange={(e) => setPassword(e.target.value)}
                         />
                     </Grid>
+                    
                     {signUp &&
                         <Grid item container justify="center" style={{ width: '100%' }}>
                             <TextField
@@ -239,6 +249,9 @@ export default function Home(props) {
                             />
                         </Grid>
                     }
+                    {(!props.loggIn && error!="") &&
+                     <Typography color="secondary" variant="subtitle2">{error}</Typography>}
+
                     <Grid item container justify="space-evenly">
                         <Grid item>
                             <LogInButton onClick={() => handleSignInButtonPressed()}>Log in</LogInButton>
