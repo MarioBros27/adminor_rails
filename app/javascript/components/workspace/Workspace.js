@@ -171,7 +171,7 @@ const AddButton = withStyles({
     }
 })(Button);
 export default function Workspace(props) {
-    
+    console.log(props.user)
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
     const theme = React.useMemo(
         () =>

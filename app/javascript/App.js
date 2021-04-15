@@ -9,7 +9,7 @@ import axios from 'axios'
 export default function App(props) {
     const [loggedIn, setLoggedIn] = useState(false)
     const [user, setUser] = useState({})
-    
+
     const handleLogin = (data) => {
         setLoggedIn(true)
         setUser(data.user)
@@ -18,12 +18,14 @@ export default function App(props) {
         setLoggedIn(false)
         setUser({})
     }
-    
+
     const checkLoginStatus = () => {
         axios.get("http://localhost:3000/logged_in", { witchCredentials: true }).then(response => {
             if (response.data.logged_in && !loggedIn) {
                 setLoggedIn(true)
-                setUser(response.user)
+                setUser(response.data.user)
+
+                // console.log(response)
                 props.history.push("/workspace")
             } else if (!response.data.logged_in && loggedIn) {
                 setLoggedIn(false)
@@ -42,7 +44,7 @@ export default function App(props) {
                         <Home  {...props} handleLogin={handleLogin} loggedIn={loggedIn} />)
                 } />
                 <Route exact path="/workspace" render={(props) =>
-                    loggedIn ? (<Workspace {...props} handleLogout={handleLogout} loggedIn={loggedIn} />) : (
+                    loggedIn ? (<Workspace {...props} user={user} handleLogout={handleLogout} loggedIn={loggedIn} />) : (
                         <Redirect to="/" />)
                 } />
                 <Route component={Error}></Route>
