@@ -11,8 +11,9 @@ export default function App(props) {
     const [user, setUser] = useState({})
 
     const handleLogin = (data) => {
-        setLoggedIn(true)
+        
         setUser(data.user)
+        setLoggedIn(true)
     }
     const handleLogout = () => {
         setLoggedIn(false)
