@@ -62,6 +62,7 @@ export default function CheckboxList(props) {
 
     return (
         <List className={classes.root}>
+            
             {props.tasks.map(task => {
                 // const labelId = `checkbox-list-label-${value}`;
                 let value = task.id
@@ -86,7 +87,7 @@ export default function CheckboxList(props) {
                                     {/* <Link href='#' color="inherit" onClick={() => { console.log(value) }}>
                                         {task.title}
                                     </Link> */}
-                                    <StyledButton onClick={() => props.handleOpenEditTask(task)}>{task.title}</StyledButton>
+                                    <StyledButton onClick={() => props.handleOpenEditTask(task)}>{task.name}</StyledButton>
                                 </Typography>
                             </Grid>
                             <Divider orientation="vertical" flexItem style={{ marginRight: "-1px" }} />

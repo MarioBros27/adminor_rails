@@ -272,7 +272,7 @@ export default function Workspace(props) {
     const handleDrawerClose = () => {
         setOpen(false);
     };
-    console.log("login state workspace", props.loggedIn)
+    // console.log("login state workspace", props.loggedIn)
     const [notDone, setNotDone] = useState(tasks)//Objects
     const [done, setDone] = useState(done_tasks)//Objects
     const [deleteTask, setDeleteTask] = useState(false)//Dialog delete task boolean
@@ -290,14 +290,12 @@ export default function Workspace(props) {
 
     useEffect(() => {
         //Fectch projects
-        console.log(props.user.projects)
+        // console.log(props.user.projects[0])
         setProjects(props.user.projects)
-        if (props.user.projects.length > 0) {
-            setCurrentViewingProject[props.user.projects[0]]
-            console.log(props.user.projects[0].name)
-        }
-
-
+        // if (props.user.projects.length > 0) {
+        //     setCurrentViewingProject(props.user.projects[0])
+        //     console.log(props.user.projects[0].name)
+        // }
     }, [props.loggedIn])
 
     const handleLogoutButtonPressed = () => {
@@ -365,7 +363,7 @@ export default function Workspace(props) {
     const handleOpenDeleteProject = function (id) {
         setDeleteProject(true);
         projectToDelete = id
-        console.log(projectToDelete)
+        // console.log(projectToDelete)
     };
 
     const handleCloseDeleteProject = () => {
@@ -401,7 +399,7 @@ export default function Workspace(props) {
             user_id: props.user.id,
             due_date: date
         }).then(response => {
-            // console.log(response.data)
+            console.log(response.data)
             projects.push(response.data)
             setProjectTitle('')
             setOpenNewProjectD(false)
@@ -515,6 +513,22 @@ export default function Workspace(props) {
     };
 
     const showProject = (id) => {
+        //Fetch it's tasks by calling project from the api
+        //TODO tasks
+        const url = `http://localhost:3000/projects/${id}`
+        axios.get(url).then(response=>{
+            const proj = response.data
+            //Set tickets
+            const doneT = response.data.tasks.filter(el=> el.done === true)
+            const notDoneT = response.data.tasks.filter(el=> el.done === false)
+            setDone(doneT)
+            setNotDone(notDoneT)
+            //Set project but remove the tickets to optimize memory use
+            delete proj.tasks
+            setCurrentViewingProject(proj)
+        }).catch(error=>{
+
+        })
 
     }
     return (
@@ -536,7 +550,7 @@ export default function Workspace(props) {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" noWrap>
+                    <Typography variant="h3" noWrap>
                         Adminor
           </Typography>
                 </Toolbar>
@@ -563,7 +577,7 @@ export default function Workspace(props) {
                 <List>
                     {projects.map(proj => {
                         return (
-                            <ListItem button key={proj.id}>
+                            <ListItem button onClick={()=>showProject(proj.id)}key={proj.id}>
                                 <ListItemText primary={proj.name} />
                                 <ListItemSecondaryAction onClick={() => handleOpenDeleteProject(proj.id)}>
                                     <IconButton edge="end" aria-label="delete">
@@ -575,7 +589,7 @@ export default function Workspace(props) {
                     })}
                 </List>
                 <Divider />
-                <StyledAddButton onClick={() => handleOpenNewProject()}>Add new project</StyledAddButton>
+                <StyledAddButton onClick={() => handleOpenNewProject()}>new project</StyledAddButton>
                 <LogOutButton onClick={() => handleLogoutButtonPressed()}>Log Out</LogOutButton>
             </Drawer>
             <main
@@ -584,7 +598,7 @@ export default function Workspace(props) {
                 })}
             >
                 <div className={classes.drawerHeader} />
-                {"name" in currentViewingProject && <>
+                {"name" in currentViewingProject ? ( <>
                     <Grid container direction='row' alignItems="flex-start">
                         <Grid item xs={11}  >
 
@@ -599,13 +613,15 @@ export default function Workspace(props) {
 
                         </Grid>
                     </Grid>
-                    <AddButton onClick={handleOpenNewTask}>Add new task</AddButton>
+                    <AddButton onClick={handleOpenNewTask}>new task</AddButton>
                     <Divider />
                     <TasksList tasks={notDone} handleOpenDeleteTask={handleOpenDeleteTask} handleOpenEditTask={handleOpenEditTask} changeTaskStatus={changeTaskStatus}></TasksList>
                     <Divider />
                     <Typography variant='h4'>Done</Typography>
                     <TasksList tasks={done} handleOpenDeleteTask={handleOpenDeleteTask} handleOpenEditTask={handleOpenEditTask} changeTaskStatus={changeTaskStatus}></TasksList>
-                </>}
+                </>) :
+                <Typography color='secondary'variant='h3'>Select a project from the sidebar</Typography>
+                }
             </main>
 
 
