@@ -84,9 +84,7 @@ export default function CheckboxList(props) {
                         <Grid container direction='row' alignItems="center">
                             <Grid item md={10} xs={12}  >
                                 <Typography variant='body1'>
-                                    {/* <Link href='#' color="inherit" onClick={() => { console.log(value) }}>
-                                        {task.title}
-                                    </Link> */}
+                                    
                                     <StyledButton onClick={() => props.handleOpenEditTask(task)}>{task.name}</StyledButton>
                                 </Typography>
                             </Grid>

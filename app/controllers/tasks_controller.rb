@@ -20,7 +20,7 @@ class TasksController < ApplicationController
     def update
         if @task
             @task.update(task_params)
-            render json: {message: 'task successfully updated'}, status: 200
+            render json: @task, status: 200
         else
             render json:{ error: 'Unable to update task.'}, status: 400
         end

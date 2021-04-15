@@ -35,84 +35,11 @@ import axios from 'axios'
 const drawerWidth = 240;
 let taskToDelete = -1
 let projectToDelete = -1
-let dummyNewId = 100
 let editingProject = false
 let editingTask = false
 
 let prettyDates = ['', 'ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DEC']
-const tasks =
-    [{
-        id: 0,
-        title: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos blanditiis tenetur,',
-        due_date: '14-7-2021',
-        done: false
-    },
-    {
-        id: 1,
-        title: 'Ir al banio',
-        due_date: '15-7-2021',
-        done: false
-    },
-    {
-        id: 2,
-        title: 'Tocar la sinfonia de bethoven',
-        due_date: '16-7-2021',
-        done: false
-    },
-    {
-        id: 3,
-        title: 'Nunca he ido al baniodesde que naci',
-        due_date: '17-7-2021',
-        done: false
-    }]
 
-const done_tasks =
-    [{
-        id: 4,
-        title: 'Comprar papael de banio',
-        due_date: '14-7-2021',
-        done: true
-    },
-    {
-        id: 5,
-        title: 'Conseguir el dinero 1',
-        due_date: '15-7-2021',
-        done: true
-    },
-    {
-        id: 6,
-        title: 'Conseguir el muero',
-        due_date: '15-7-2021',
-        done: true
-    }]
-
-// const starting_projects = ['Proyecto de desarrollo web', 'Proyecto comprar limones', 'Compiladores', 'Proyecto recuperacion de agua'];
-const starting_projects = [
-    {
-        id: 0,
-        project_name: 'Proyecto de desarrollo web',
-        user_id: 0,
-        due_date: '9-9-2021'
-    },
-    {
-        id: 1,
-        project_name: 'Proyecto comprar limones',
-        user_id: 0,
-        due_date: '10-9-2021'
-    },
-    {
-        id: 2,
-        project_name: 'Compiladores',
-        user_id: 0,
-        due_date: '11-9-2021'
-    },
-    {
-        id: 3,
-        project_name: 'Proyecto recuperacion de agua',
-        user_id: 0,
-        due_date: '12-9-2021'
-    },
-]
 const StyledAddButton = withStyles({
     root: {
         //   background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
@@ -185,7 +112,6 @@ export default function Workspace(props) {
             }),
         [prefersDarkMode],
     );
-
 
     let isLaptop = useMediaQuery('(min-width: 600px)', { noSsr: true })
 
@@ -274,8 +200,8 @@ export default function Workspace(props) {
         setOpen(false);
     };
     // console.log("login state workspace", props.loggedIn)
-    const [notDone, setNotDone] = useState(tasks)//Objects
-    const [done, setDone] = useState(done_tasks)//Objects
+    const [notDone, setNotDone] = useState([])//Objects
+    const [done, setDone] = useState([])//Objects
     const [deleteTask, setDeleteTask] = useState(false)//Dialog delete task boolean
     const [deleteProject, setDeleteProject] = useState(false)//Dialog delete project boolean
     const [projectTitle, setProjectTitle] = useState('')//Project title placeholder
@@ -286,10 +212,10 @@ export default function Workspace(props) {
     const [projects, setProjects] = useState(props.user.projects)//Objects
     const [currentViewingProject, setCurrentViewingProject] = useState({})//Selected viewing project object
     const [currentTask, setCurrentTask] = useState({})//Selected task object that will be modified
-//
+    //
     const [selectedDate, setSelectedDate] = useState(new Date());
 
-   
+
     const handleLogoutButtonPressed = () => {
         axios.delete("http://localhost:3000/logout", { withCredentials: true }).then(response => {
             props.handleLogout()
@@ -301,39 +227,54 @@ export default function Workspace(props) {
         //If value is true it means that a not done is changed to done. If else the opposite
         var doneTemp = done
         var notDoneTemp = notDone
+        const doneBackup =done
+        const notDoneBackup = notDone
+        axios.put(`http://localhost:3000/tasks/${id}`, {
+            done: value
+        }).then(response => {
 
-        //Removing the element to be transfered
-        if (value) {
-            //Transfering to new list
-            const toBeTransfered = notDoneTemp.filter(el => el.id === id)
-            const actuallyToBeTransfered = toBeTransfered[0]
-            actuallyToBeTransfered.done = value
+        }).catch(error => { 
+            if(value){
+                setDone(doneBackup)
+            }else{
+                setNotDone(notDoneBackup)
+            }
+        
+        })
+            //Removing the element to be transfered
+            if (value) {
+                //Transfering to new list
+                const toBeTransfered = notDoneTemp.filter(el => el.id === id)
+                const actuallyToBeTransfered = toBeTransfered[0]
+                actuallyToBeTransfered.done = value
 
-            //Pushing
-            doneTemp.push(actuallyToBeTransfered)
-            //Sort them by date
-            // doneTemp = doneTemp.sort(function (a,b){
-            //     // Turn your strings into dates, and then subtract them
-            //     // to get a value that is either negative, positive, or zero.
-            //     return new Date(b.due_date) - new Date(a.due_date);
-            //   });
+                //Pushing
+                doneTemp.push(actuallyToBeTransfered)
+                //Sort them by date
+                // doneTemp = doneTemp.sort(function (a,b){
+                //     // Turn your strings into dates, and then subtract them
+                //     // to get a value that is either negative, positive, or zero.
+                //     return new Date(b.due_date) - new Date(a.due_date);
+                //   });
 
-            //Deleting from previous list
-            notDoneTemp = notDoneTemp.filter(el => el.id !== id)
-        } else {
-            //Transfering to new list
-            const toBeTransfered = doneTemp.filter(el => el.id === id)
-            const actuallyToBeTransfered = toBeTransfered[0]
-            actuallyToBeTransfered.done = value
-            // console.log(actuallyToBeTransfered)
-            // console.log(actuallyToBeTransfered[0].value)
-            // //Pushing
-            notDoneTemp.push(actuallyToBeTransfered)
-            // //Deleting from previous list
-            doneTemp = doneTemp.filter(el => el.id !== id)
-        }
-        setDone(doneTemp)
-        setNotDone(notDoneTemp)
+                //Deleting from previous list
+                notDoneTemp = notDoneTemp.filter(el => el.id !== id)
+            } else {
+                //Transfering to new list
+                const toBeTransfered = doneTemp.filter(el => el.id === id)
+                const actuallyToBeTransfered = toBeTransfered[0]
+                actuallyToBeTransfered.done = value
+                // console.log(actuallyToBeTransfered)
+                // console.log(actuallyToBeTransfered[0].value)
+                // //Pushing
+                notDoneTemp.push(actuallyToBeTransfered)
+                // //Deleting from previous list
+                doneTemp = doneTemp.filter(el => el.id !== id)
+            }
+            setDone(doneTemp)
+            setNotDone(notDoneTemp)
+
+
     }
     //Delete task Dialog
     const handleOpenDeleteTask = function (id) {
@@ -346,10 +287,15 @@ export default function Workspace(props) {
         setDeleteTask(false);
     };
     const handleDeleteTask = () => {
-        //Delete from wherever it is try not done and done
+        const url = `http://localhost:3000/tasks/${taskToDelete}`
+        axios.delete(url).then(response => {
+            //Delete from wherever it is try not done and done
         setNotDone(notDone.filter(el => el.id !== taskToDelete))
         setDone(done.filter(el => el.id !== taskToDelete))
         setDeleteTask(false);
+        }).catch(error => {
+        })
+        
     };
     //Delete Project DIalog
     const handleOpenDeleteProject = function (id) {
@@ -409,8 +355,8 @@ export default function Workspace(props) {
             name: projectTitle,
             due_date: date
         }).then(response => {
-            projects.forEach(el=>{
-                if(el.id === currentViewingProject.id){
+            projects.forEach(el => {
+                if (el.id === currentViewingProject.id) {
                     el['name'] = projectTitle
                 }
             })
@@ -437,14 +383,10 @@ export default function Workspace(props) {
             postProject(newDate)
 
         } else {//Edit 
-            // currentViewingProject['due_date'] = newDate
             if (projectTitle !== '') {
-                // currentViewingProject['project_name'] = projectTitle
                 putProject(newDate)
             }
         }
-        // setProjectTitle('')
-        // setOpenNewProjectD(false)
     };
     //Edit project 
     const handleOpenEditProject = function () {
@@ -471,6 +413,75 @@ export default function Workspace(props) {
         setOpenNewTaskD(false)
         setTaskTitle('')
     };
+    const postTask = (date) => {
+        var name = taskTitle
+        if (taskTitle === '') {
+            name = 'Nada'
+        }
+        axios.post('http://localhost:3000/tasks', {
+            name: name,
+            project_id: currentViewingProject.id,
+            due_date: date,
+            done: false
+        }).then(response => {
+            const new_guy = response.data
+            console.log(new_guy)
+            new_guy['pretty_date'] = getPrettyDate(new_guy['due_date'])
+
+            notDone.push(new_guy)
+            setTaskTitle('')
+            setOpenNewTaskD(false)
+        }).catch(error => {
+            return -1
+        })
+    }
+    const putTask = (date) => {
+        var name = taskTitle
+        if (taskTitle === '') {
+            name = 'Nada'
+        }
+        axios.put(`http://localhost:3000/tasks/${currentTask.id}`, {
+            name: name,
+            due_date: date
+        }).then(response => {
+            console.log("made it here", currentTask)
+            console.log(currentTask.done)
+            const new_guy = response.data
+            console.log(new_guy)
+            new_guy['pretty_date'] = getPrettyDate(new_guy['due_date'])
+            console.log(new_guy['pretty_date'])
+            if (currentTask.done) {
+                let newList = []
+                done.forEach(el => {
+
+                    if (el.id === new_guy.id) {
+                        newList.push(new_guy)
+                    } else {
+                        newList.push(el)
+                    }
+                })
+
+                setDone(newList)
+            } else {
+                let newList = []
+                notDone.forEach(el => {
+
+                    if (el.id === new_guy.id) {
+                        newList.push(new_guy)
+                    } else {
+                        newList.push(el)
+                    }
+                })
+                console.log("newlist", newList)
+                setNotDone(newList)
+            }
+            setTaskTitle('')
+            setOpenNewTaskD(false)
+        }).catch(error => {
+            return -1
+        })
+    }
+    //Saving new or editing a task
     const handleSaveNewTask = () => {
         console.log(selectedDate)
         var date = selectedDate.getDate().toString()
@@ -479,35 +490,10 @@ export default function Workspace(props) {
         var newDate = `${date}-${month}-${year}`
         console.log(newDate)
         if (!editingTask) {
-
-            var dummyNewTask = {
-                id: dummyNewId,
-                title: 'No title',
-                due_date: newDate,
-                done: false
-            }
-
-            if (taskTitle !== '') {
-                dummyNewTask['title'] = taskTitle
-            }
-            dummyNewId += 1
-            notDone.push(dummyNewTask)
-
+            postTask(newDate)
         } else {
-            //TODO make a variable save the selected task when editTask() is called
-            //Done it's called currentTask
-            //Delete from wherever it is try not done and done
-            setNotDone(notDone.filter(el => el.id !== setCurrentTask.id))
-            setDone(done.filter(el => el.id !== setCurrentTask.id))
-            //Push it to not added
-            currentTask['due_date'] = newDate
-            if (taskTitle !== '') {
-                currentTask['title'] = taskTitle
-            }
-            notDone.push(currentTask)
+            putTask(newDate)
         }
-        setTaskTitle('')
-        setOpenNewTaskD(false)
     };
     //Edit Task 
     const handleOpenEditTask = function (task) {
@@ -522,7 +508,7 @@ export default function Workspace(props) {
         console.log(date)
         setSelectedDate(date)
         setCurrentTask(task)
-        setTaskTitle(task.title)
+        setTaskTitle(task.name)
         setOpenNewTaskD(true)
     };
 
@@ -702,7 +688,7 @@ export default function Workspace(props) {
                         variant="outlined"
                         inputProps={{ maxLength: 80 }}
                         multiline
-                        color="secondary"
+                        color="primary"
                         rowsMax={5}
                         value={projectTitle}
                         onChange={(e) => setProjectTitle(e.target.value)}
@@ -729,7 +715,7 @@ export default function Workspace(props) {
                         variant="outlined"
                         inputProps={{ maxLength: 80 }}
                         multiline
-                        color="secondary"
+                        color="primary"
                         rowsMax={5}
                         value={taskTitle}
                         onChange={(e) => setTaskTitle(e.target.value)}
