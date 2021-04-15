@@ -39,6 +39,7 @@ let dummyNewId = 100
 let editingProject = false
 let editingTask = false
 
+let prettyDates = ['', 'ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DEC']
 const tasks =
     [{
         id: 0,
@@ -282,22 +283,13 @@ export default function Workspace(props) {
     const [taskTitle, setTaskTitle] = useState('')//Task title placeholder
     const [openNewTaskD, setOpenNewTaskD] = useState(false)//Dialog create task boolean
     // const [projects, setProjects] = useState(starting_projects)//Objects
-    const [projects, setProjects] = useState([])//Objects
+    const [projects, setProjects] = useState(props.user.projects)//Objects
     const [currentViewingProject, setCurrentViewingProject] = useState({})//Selected viewing project object
     const [currentTask, setCurrentTask] = useState({})//Selected task object that will be modified
-
+//
     const [selectedDate, setSelectedDate] = useState(new Date());
 
-    useEffect(() => {
-        //Fectch projects
-        // console.log(props.user.projects[0])
-        setProjects(props.user.projects)
-        // if (props.user.projects.length > 0) {
-        //     setCurrentViewingProject(props.user.projects[0])
-        //     console.log(props.user.projects[0].name)
-        // }
-    }, [props.loggedIn])
-
+   
     const handleLogoutButtonPressed = () => {
         axios.delete("http://localhost:3000/logout", { withCredentials: true }).then(response => {
             props.handleLogout()
@@ -375,7 +367,7 @@ export default function Workspace(props) {
             setDeleteProject(false);
             setProjects(projects.filter(el => el.id !== projectToDelete))
             // console.log(projectToDelete)
-        }).catch(error=>{
+        }).catch(error => {
             console.log(error)
         })
 
@@ -392,8 +384,12 @@ export default function Workspace(props) {
         setOpenNewProjectD(false)
         setProjectTitle('')
     };
-    const postProject = (name, date) => {
+    const postProject = (date) => {
         console.log(date)
+        var name = projectTitle
+        if (projectTitle === '') {
+            name = 'No name'
+        }
         axios.post('http://localhost:3000/projects', {
             name: name,
             user_id: props.user.id,
@@ -407,6 +403,29 @@ export default function Workspace(props) {
             return -1
         })
     }
+    const putProject = (date) => {
+        const url = `http://localhost:3000/projects/${currentViewingProject.id}`
+        axios.put(url, {
+            name: projectTitle,
+            due_date: date
+        }).then(response => {
+            projects.forEach(el=>{
+                if(el.id === currentViewingProject.id){
+                    el['name'] = projectTitle
+                }
+            })
+            // projects[currentViewingProject.id]['name'] = projectTitle
+            currentViewingProject.name = projectTitle
+            currentViewingProject['due_date'] = date
+            currentViewingProject['pretty_date'] = getPrettyDate(date)
+            setProjectTitle('')
+            setOpenNewProjectD(false)
+            //async update projects after fetching the server
+        }).catch(error => {
+            return -1
+        })
+    }
+    ///Save new or edited project
     const handleSaveNewProject = () => {
         console.log(selectedDate)
         var date = selectedDate.getDate().toString()
@@ -414,19 +433,14 @@ export default function Workspace(props) {
         var year = selectedDate.getFullYear().toString()
         var newDate = `${date}-${month}-${year}`
         console.log(newDate)
-        if (!editingProject) {
+        if (!editingProject) {//Post new
+            postProject(newDate)
 
+        } else {//Edit 
+            // currentViewingProject['due_date'] = newDate
             if (projectTitle !== '') {
-                postProject(projectTitle, newDate)
-            } else {
-                postProject('No name', newDate)
-
-            }
-
-        } else {
-            currentViewingProject['due_date'] = newDate
-            if (projectTitle !== '') {
-                currentViewingProject['project_name'] = projectTitle
+                // currentViewingProject['project_name'] = projectTitle
+                putProject(newDate)
             }
         }
         // setProjectTitle('')
@@ -443,7 +457,7 @@ export default function Workspace(props) {
         // var date = format(new Date(year, month, day), 'yyyy-MM-dd')
         console.log(date)
         setSelectedDate(date)
-        setProjectTitle(currentViewingProject.project_name)
+        setProjectTitle(currentViewingProject.name)
         setOpenNewProjectD(true)
     };
     ///NEw Task
@@ -516,20 +530,36 @@ export default function Workspace(props) {
         //Fetch it's tasks by calling project from the api
         //TODO tasks
         const url = `http://localhost:3000/projects/${id}`
-        axios.get(url).then(response=>{
+        axios.get(url).then(response => {
             const proj = response.data
             //Set tickets
-            const doneT = response.data.tasks.filter(el=> el.done === true)
-            const notDoneT = response.data.tasks.filter(el=> el.done === false)
+            const doneT = response.data.tasks.filter(el => el.done === true)
+            const notDoneT = response.data.tasks.filter(el => el.done === false)
+            doneT.forEach(el => {
+                el["pretty_date"] = getPrettyDate(el.due_date)
+            })
+            notDoneT.forEach(el => {
+                el["pretty_date"] = getPrettyDate(el.due_date)
+            })
             setDone(doneT)
             setNotDone(notDoneT)
+            // const pretty = getPrettyDate(proj.due_date)
+            // console.log("pretty",pretty)
+            proj["pretty_date"] = getPrettyDate(proj.due_date)
             //Set project but remove the tickets to optimize memory use
             delete proj.tasks
             setCurrentViewingProject(proj)
-        }).catch(error=>{
+        }).catch(error => {
 
         })
 
+    }
+    const getPrettyDate = (ugly_date) => {
+        var splitted = ugly_date.split("-")
+        var day = parseInt(splitted[0])
+        var month = parseInt(splitted[1])
+        var year = parseInt(splitted[2])
+        return `${day}-${prettyDates[month]}-${year}`
     }
     return (
         <ThemeProvider theme={theme}>
@@ -577,7 +607,7 @@ export default function Workspace(props) {
                 <List>
                     {projects.map(proj => {
                         return (
-                            <ListItem button onClick={()=>showProject(proj.id)}key={proj.id}>
+                            <ListItem button onClick={() => showProject(proj.id)} key={proj.id}>
                                 <ListItemText primary={proj.name} />
                                 <ListItemSecondaryAction onClick={() => handleOpenDeleteProject(proj.id)}>
                                     <IconButton edge="end" aria-label="delete">
@@ -598,12 +628,12 @@ export default function Workspace(props) {
                 })}
             >
                 <div className={classes.drawerHeader} />
-                {"name" in currentViewingProject ? ( <>
+                {"name" in currentViewingProject ? (<>
                     <Grid container direction='row' alignItems="flex-start">
                         <Grid item xs={11}  >
 
                             <Typography variant="h3" >{currentViewingProject.name}</Typography>
-                            <Typography variant="subtitle1" >{currentViewingProject.due_date}</Typography>
+                            <Typography variant="subtitle1" >{currentViewingProject.pretty_date}</Typography>
                         </Grid>
 
                         <Grid item container xs={1} >
@@ -620,7 +650,7 @@ export default function Workspace(props) {
                     <Typography variant='h4'>Done</Typography>
                     <TasksList tasks={done} handleOpenDeleteTask={handleOpenDeleteTask} handleOpenEditTask={handleOpenEditTask} changeTaskStatus={changeTaskStatus}></TasksList>
                 </>) :
-                <Typography color='secondary'variant='h3'>Select a project from the sidebar</Typography>
+                    <Typography color='secondary' variant='h3'>Select a project from the sidebar</Typography>
                 }
             </main>
 

@@ -92,7 +92,7 @@ export default function CheckboxList(props) {
                             </Grid>
                             <Divider orientation="vertical" flexItem style={{ marginRight: "-1px" }} />
                             <Grid item container md={2} xs={12} justify="center">
-                                {task.due_date}
+                                {task.pretty_date}
 
                             </Grid>
                         </Grid>
