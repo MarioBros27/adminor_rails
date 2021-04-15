@@ -22,9 +22,9 @@ export default function App(props) {
     const checkLoginStatus = () => {
         axios.get("http://localhost:3000/logged_in", { witchCredentials: true }).then(response => {
             if (response.data.logged_in && !loggedIn) {
-                setLoggedIn(true)
+                
                 setUser(response.data.user)
-
+                setLoggedIn(true)
                 // console.log(response)
                 props.history.push("/workspace")
             } else if (!response.data.logged_in && loggedIn) {

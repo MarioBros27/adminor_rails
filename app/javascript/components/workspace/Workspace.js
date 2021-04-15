@@ -1,6 +1,6 @@
 
 import { makeStyles } from '@material-ui/core/styles';
-import React, { useState,useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button'
 import { withStyles } from '@material-ui/core/styles';
@@ -171,7 +171,7 @@ const AddButton = withStyles({
     }
 })(Button);
 export default function Workspace(props) {
-    console.log(props.user)
+    // console.log(props.user)
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
     const theme = React.useMemo(
         () =>
@@ -281,16 +281,25 @@ export default function Workspace(props) {
     const [openNewProjectD, setOpenNewProjectD] = useState(false)//Dialog create project boolean 
     const [taskTitle, setTaskTitle] = useState('')//Task title placeholder
     const [openNewTaskD, setOpenNewTaskD] = useState(false)//Dialog create task boolean
-    const [projects, setProjects] = useState(starting_projects)//Objects
-    const [currentViewingProject, setCurrentViewingProject] = useState(projects[0])//Selected viewing project object
+    // const [projects, setProjects] = useState(starting_projects)//Objects
+    const [projects, setProjects] = useState([])//Objects
+    const [currentViewingProject, setCurrentViewingProject] = useState({})//Selected viewing project object
     const [currentTask, setCurrentTask] = useState({})//Selected task object that will be modified
 
     const [selectedDate, setSelectedDate] = useState(new Date());
 
-    // useEffect(()=>{
-    //     //Fectch projects
+    useEffect(() => {
+        //Fectch projects
+        console.log(props.user.projects)
+        setProjects(props.user.projects)
+        if (props.user.projects.length > 0) {
+            setCurrentViewingProject[props.user.projects[0]]
+            console.log(props.user.projects[0].name)
+        }
 
-    // },[])
+
+    }, [props.loggedIn])
+
     const handleLogoutButtonPressed = () => {
         axios.delete("http://localhost:3000/logout", { withCredentials: true }).then(response => {
             props.handleLogout()
@@ -363,9 +372,15 @@ export default function Workspace(props) {
         setDeleteProject(false);
     };
     const handleDeleteProject = () => {
-        setDeleteProject(false);
-        setProjects(projects.filter(el => el.id !== projectToDelete))
-        console.log(projectToDelete)
+        const url = `http://localhost:3000/projects/${projectToDelete}`
+        axios.delete(url).then(response => {
+            setDeleteProject(false);
+            setProjects(projects.filter(el => el.id !== projectToDelete))
+            // console.log(projectToDelete)
+        }).catch(error=>{
+            console.log(error)
+        })
+
     };
 
     ///NEw Project
@@ -379,6 +394,21 @@ export default function Workspace(props) {
         setOpenNewProjectD(false)
         setProjectTitle('')
     };
+    const postProject = (name, date) => {
+        console.log(date)
+        axios.post('http://localhost:3000/projects', {
+            name: name,
+            user_id: props.user.id,
+            due_date: date
+        }).then(response => {
+            // console.log(response.data)
+            projects.push(response.data)
+            setProjectTitle('')
+            setOpenNewProjectD(false)
+        }).catch(error => {
+            return -1
+        })
+    }
     const handleSaveNewProject = () => {
         console.log(selectedDate)
         var date = selectedDate.getDate().toString()
@@ -388,18 +418,12 @@ export default function Workspace(props) {
         console.log(newDate)
         if (!editingProject) {
 
-            var dummyNewProject = {
-                id: dummyNewId,
-                project_name: 'No name',
-                user_id: 0,
-                due_date: newDate
-            }
-
             if (projectTitle !== '') {
-                dummyNewProject['project_name'] = projectTitle
+                postProject(projectTitle, newDate)
+            } else {
+                postProject('No name', newDate)
+
             }
-            dummyNewId += 1
-            projects.push(dummyNewProject)
 
         } else {
             currentViewingProject['due_date'] = newDate
@@ -407,8 +431,8 @@ export default function Workspace(props) {
                 currentViewingProject['project_name'] = projectTitle
             }
         }
-        setProjectTitle('')
-        setOpenNewProjectD(false)
+        // setProjectTitle('')
+        // setOpenNewProjectD(false)
     };
     //Edit project 
     const handleOpenEditProject = function () {
@@ -489,6 +513,10 @@ export default function Workspace(props) {
         setTaskTitle(task.title)
         setOpenNewTaskD(true)
     };
+
+    const showProject = (id) => {
+
+    }
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
@@ -536,7 +564,7 @@ export default function Workspace(props) {
                     {projects.map(proj => {
                         return (
                             <ListItem button key={proj.id}>
-                                <ListItemText primary={proj.project_name} />
+                                <ListItemText primary={proj.name} />
                                 <ListItemSecondaryAction onClick={() => handleOpenDeleteProject(proj.id)}>
                                     <IconButton edge="end" aria-label="delete">
                                         <DeleteIcon></DeleteIcon>
@@ -556,27 +584,28 @@ export default function Workspace(props) {
                 })}
             >
                 <div className={classes.drawerHeader} />
-                <Grid container direction='row' alignItems="flex-start">
-                    <Grid item xs={11}  >
+                {"name" in currentViewingProject && <>
+                    <Grid container direction='row' alignItems="flex-start">
+                        <Grid item xs={11}  >
 
-                        <Typography variant="h3" >{currentViewingProject.project_name}</Typography>
-                        <Typography variant="subtitle1" >{currentViewingProject.due_date}</Typography>
+                            <Typography variant="h3" >{currentViewingProject.name}</Typography>
+                            <Typography variant="subtitle1" >{currentViewingProject.due_date}</Typography>
+                        </Grid>
+
+                        <Grid item container xs={1} >
+                            <Button onClick={handleOpenEditProject}>
+                                <EditIcon></EditIcon>
+                            </Button>
+
+                        </Grid>
                     </Grid>
-
-                    <Grid item container xs={1} >
-                        <Button onClick={handleOpenEditProject}>
-                            <EditIcon></EditIcon>
-                        </Button>
-
-                    </Grid>
-                </Grid>
-                <AddButton onClick={handleOpenNewTask}>Add new task</AddButton>
-                <Divider />
-                <TasksList tasks={notDone} handleOpenDeleteTask={handleOpenDeleteTask} handleOpenEditTask={handleOpenEditTask} changeTaskStatus={changeTaskStatus}></TasksList>
-                <Divider />
-                <Typography variant='h4'>Done</Typography>
-                <TasksList tasks={done} handleOpenDeleteTask={handleOpenDeleteTask} handleOpenEditTask={handleOpenEditTask} changeTaskStatus={changeTaskStatus}></TasksList>
-
+                    <AddButton onClick={handleOpenNewTask}>Add new task</AddButton>
+                    <Divider />
+                    <TasksList tasks={notDone} handleOpenDeleteTask={handleOpenDeleteTask} handleOpenEditTask={handleOpenEditTask} changeTaskStatus={changeTaskStatus}></TasksList>
+                    <Divider />
+                    <Typography variant='h4'>Done</Typography>
+                    <TasksList tasks={done} handleOpenDeleteTask={handleOpenDeleteTask} handleOpenEditTask={handleOpenEditTask} changeTaskStatus={changeTaskStatus}></TasksList>
+                </>}
             </main>
 
 
