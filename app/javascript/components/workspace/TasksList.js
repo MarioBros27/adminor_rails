@@ -4,7 +4,6 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-// import ListItemText from '@material-ui/core/ListItemText';
 import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -37,34 +36,16 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function CheckboxList(props) {
-    // console.log(props)
     const classes = useStyles();
-    // const [checked, setChecked] = useState(tasks);
 
     const handleToggle = (id) => (event) => {
-        // const currentIndex = checked.indexOf(value);
-        // const newChecked = [...checked];
-        // console.log(newChecked)
-        // if (currentIndex === -1) {
-        //     newChecked.push(value);
-        // } else {
-        //     newChecked.splice(currentIndex, 1);
-        // }
-        
-        // tasks[elementIndex].id = value
-        // console.log(elementIndex)
-        // console.log(event.target.checked)
         props.changeTaskStatus(event.target.checked,id);
-        // setChecked(event.target.checked)
-        // setChecked(newChecked);
-        //ma
     };
 
     return (
         <List className={classes.root}>
             
             {props.tasks.map(task => {
-                // const labelId = `checkbox-list-label-${value}`;
                 let value = task.id
                 
                 return (

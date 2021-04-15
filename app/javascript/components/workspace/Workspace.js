@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import React, { useState, useEffect } from 'react'
 import { Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button'
+import { green } from '@material-ui/core/colors';
 import { withStyles } from '@material-ui/core/styles';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -31,6 +32,8 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import TasksList from './TasksList'
 import DatePicker from './DatePicker'
 import axios from 'axios'
+import CircularProgress from '@material-ui/core/CircularProgress';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 const drawerWidth = 240;
 let taskToDelete = -1
@@ -40,6 +43,20 @@ let editingTask = false
 
 let prettyDates = ['', 'ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DEC']
 
+const StyledCircularProgress = withStyles({
+    root: {
+        color: green[500],
+
+    }
+})(CircularProgress);
+const StyledLinearProgress = withStyles({
+    root: {
+        color: '52b202',
+        witdh: '100%',
+        height: '4px'
+
+    }
+})(LinearProgress);
 const StyledAddButton = withStyles({
     root: {
         //   background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
@@ -51,6 +68,7 @@ const StyledAddButton = withStyles({
         boxShadow: '0 3px 5px 2px rgba(255, 105, 135, .3)',
     }
 })(Button);
+
 const SaveButton = withStyles({
     root: {
         //   background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
@@ -212,7 +230,7 @@ export default function Workspace(props) {
     const [projects, setProjects] = useState(props.user.projects)//Objects
     const [currentViewingProject, setCurrentViewingProject] = useState({})//Selected viewing project object
     const [currentTask, setCurrentTask] = useState({})//Selected task object that will be modified
-    //
+    const [loading, setLoading] = useState(false)
     const [selectedDate, setSelectedDate] = useState(new Date());
 
 
@@ -227,52 +245,47 @@ export default function Workspace(props) {
         //If value is true it means that a not done is changed to done. If else the opposite
         var doneTemp = done
         var notDoneTemp = notDone
-        const doneBackup =done
+        const doneBackup = done
         const notDoneBackup = notDone
         axios.put(`http://localhost:3000/tasks/${id}`, {
             done: value
         }).then(response => {
 
-        }).catch(error => { 
-            if(value){
+        }).catch(error => {
+            if (value) {
                 setDone(doneBackup)
-            }else{
+            } else {
                 setNotDone(notDoneBackup)
             }
-        
+
         })
-            //Removing the element to be transfered
-            if (value) {
-                //Transfering to new list
-                const toBeTransfered = notDoneTemp.filter(el => el.id === id)
-                const actuallyToBeTransfered = toBeTransfered[0]
-                actuallyToBeTransfered.done = value
+        //Removing the element to be transfered
+        if (value) {
+            //Transfering to new list
+            const toBeTransfered = notDoneTemp.filter(el => el.id === id)
+            const actuallyToBeTransfered = toBeTransfered[0]
+            actuallyToBeTransfered.done = value
 
-                //Pushing
-                doneTemp.push(actuallyToBeTransfered)
-                //Sort them by date
-                // doneTemp = doneTemp.sort(function (a,b){
-                //     // Turn your strings into dates, and then subtract them
-                //     // to get a value that is either negative, positive, or zero.
-                //     return new Date(b.due_date) - new Date(a.due_date);
-                //   });
+            //Pushing
+            doneTemp.push(actuallyToBeTransfered)
+            //TODO: Sort them by date
 
-                //Deleting from previous list
-                notDoneTemp = notDoneTemp.filter(el => el.id !== id)
-            } else {
-                //Transfering to new list
-                const toBeTransfered = doneTemp.filter(el => el.id === id)
-                const actuallyToBeTransfered = toBeTransfered[0]
-                actuallyToBeTransfered.done = value
-                // console.log(actuallyToBeTransfered)
-                // console.log(actuallyToBeTransfered[0].value)
-                // //Pushing
-                notDoneTemp.push(actuallyToBeTransfered)
-                // //Deleting from previous list
-                doneTemp = doneTemp.filter(el => el.id !== id)
-            }
-            setDone(doneTemp)
-            setNotDone(notDoneTemp)
+            //Deleting from previous list
+            notDoneTemp = notDoneTemp.filter(el => el.id !== id)
+        } else {
+            //Transfering to new list
+            const toBeTransfered = doneTemp.filter(el => el.id === id)
+            const actuallyToBeTransfered = toBeTransfered[0]
+            actuallyToBeTransfered.done = value
+            // console.log(actuallyToBeTransfered)
+            // console.log(actuallyToBeTransfered[0].value)
+            // //Pushing
+            notDoneTemp.push(actuallyToBeTransfered)
+            // //Deleting from previous list
+            doneTemp = doneTemp.filter(el => el.id !== id)
+        }
+        setDone(doneTemp)
+        setNotDone(notDoneTemp)
 
 
     }
@@ -290,12 +303,12 @@ export default function Workspace(props) {
         const url = `http://localhost:3000/tasks/${taskToDelete}`
         axios.delete(url).then(response => {
             //Delete from wherever it is try not done and done
-        setNotDone(notDone.filter(el => el.id !== taskToDelete))
-        setDone(done.filter(el => el.id !== taskToDelete))
-        setDeleteTask(false);
+            setNotDone(notDone.filter(el => el.id !== taskToDelete))
+            setDone(done.filter(el => el.id !== taskToDelete))
+            setDeleteTask(false);
         }).catch(error => {
         })
-        
+
     };
     //Delete Project DIalog
     const handleOpenDeleteProject = function (id) {
@@ -515,6 +528,7 @@ export default function Workspace(props) {
     const showProject = (id) => {
         //Fetch it's tasks by calling project from the api
         //TODO tasks
+        setLoading(true)
         const url = `http://localhost:3000/projects/${id}`
         axios.get(url).then(response => {
             const proj = response.data
@@ -535,10 +549,8 @@ export default function Workspace(props) {
             //Set project but remove the tickets to optimize memory use
             delete proj.tasks
             setCurrentViewingProject(proj)
-        }).catch(error => {
-
-        })
-
+            setLoading(false)
+        }).catch(error => { setLoading(false) })
     }
     const getPrettyDate = (ugly_date) => {
         var splitted = ugly_date.split("-")
@@ -550,6 +562,7 @@ export default function Workspace(props) {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
+
             <AppBar
                 position="fixed"
                 className={clsx(classes.appBar, {
@@ -568,7 +581,8 @@ export default function Workspace(props) {
                     </IconButton>
                     <Typography variant="h3" noWrap>
                         Adminor
-          </Typography>
+                    </Typography>
+                    
                 </Toolbar>
             </AppBar>
             <Drawer
@@ -581,6 +595,8 @@ export default function Workspace(props) {
                 }}
             >
                 <div className={classes.drawerHeader}>
+
+
                     {
                         isLaptop === false &&
                         <IconButton onClick={handleDrawerClose}>
@@ -590,6 +606,7 @@ export default function Workspace(props) {
 
                 </div>
                 <Divider />
+                {loading && <StyledLinearProgress  />}
                 <List>
                     {projects.map(proj => {
                         return (
@@ -639,8 +656,6 @@ export default function Workspace(props) {
                     <Typography color='secondary' variant='h3'>Select a project from the sidebar</Typography>
                 }
             </main>
-
-
             <Dialog
                 open={deleteTask}
                 onClose={handleCloseDeleteTask}
@@ -731,12 +746,7 @@ export default function Workspace(props) {
                         </SaveButton>
                 </DialogActions>
             </Dialog>
-
-
-
-
         </ThemeProvider>
-
     )
 }
 
