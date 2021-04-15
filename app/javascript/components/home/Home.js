@@ -147,6 +147,7 @@ export default function Home(props) {
         },
             { withCredentials: true }
         ).then(response => {
+            console.log("response from google log in, existing", reponse)
             if (response.data.logged_in) {
                 handleSuccesfulAuth(response.data)
             }
@@ -165,6 +166,7 @@ export default function Home(props) {
                         handleSuccesfulAuth(response.data)
                     }
                 }).catch(error => {
+                    console.log("fuck me")
                     setError("Something went wrong while trying to sign in with Google, try again")
                 })
             } else {//something else happened and tell user to check something else
@@ -201,7 +203,7 @@ export default function Home(props) {
 
                                 )}
                                 onSuccess={handleGoogleLogin}
-                                onFailure={handleGoogleLogInFailure}
+                                onFailure={()=>handleGoogleLogInFailure}
                                 cookiePolicy={'single_host_origin'}
                             />
 

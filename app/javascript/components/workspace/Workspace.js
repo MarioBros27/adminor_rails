@@ -287,6 +287,10 @@ export default function Workspace(props) {
 
     const [selectedDate, setSelectedDate] = useState(new Date());
 
+    // useEffect(()=>{
+    //     //Fectch projects
+
+    // },[])
     const handleLogoutButtonPressed = () => {
         axios.delete("http://localhost:3000/logout", { withCredentials: true }).then(response => {
             props.handleLogout()

@@ -17,12 +17,12 @@ def create
     
     if user 
         session[:user_id] = user.id
-        render json: user.as_json(include: [:projects]).merge({status: :created, logged_in: true})
-        # render json: {
-        #     status: :created,
-        #     logged_in: true,
-        #     user: user
-        # }
+        # render json: user.as_json(include: [:projects]).merge({status: :created, logged_in: true})
+        render json: {
+            status: :created,
+            logged_in: true,
+            user: user.as_json(include: [:projects])
+        }
     else
         return head 422
     end
