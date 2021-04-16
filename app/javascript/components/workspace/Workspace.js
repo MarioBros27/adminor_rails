@@ -41,7 +41,33 @@ let editingProject = false
 let editingTask = false
 
 let prettyDates = ['', 'ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DEC']
+const color ={
+    red:"#f50057",
+    yellow:"#999900",
+    green:"#52b202",
+    gray:"#add8e6"
+}
+const getColor = (date)=>{
+    const splitted = date.split("-")
+    const day = parseInt(splitted[0])
+    const month = parseInt(splitted[1]) - 1
+    const year = parseInt(splitted[2])
+    const dateT = new Date(year, month, day).setHours(0,0,0,0)
+    const today = new Date().setHours(0,0,0,0)
+    const difference = parseInt((dateT - today)/(24*3600*1000))
+    let color = ""
 
+    if (dateT < today){
+        color = "gray"
+    }else if (difference <= 1){
+        color = "red"
+    }else if (difference< 7){
+        color = "yellow"
+    }else if (difference >= 7){
+        color = "green"
+    }
+    return color
+}
 const StyledLinearProgress = withStyles({
     root: {
         color: '52b202',
@@ -125,7 +151,7 @@ export default function Workspace(props) {
     );
 
     let isLaptop = useMediaQuery('(min-width: 600px)', { noSsr: true })
-
+        
     //Play with drawer width with different sizes, simply modify variable drawerWidth
     const useStyles = makeStyles((theme) => {
         let shift = {}
@@ -225,8 +251,16 @@ export default function Workspace(props) {
     const [currentTask, setCurrentTask] = useState({})//Selected task object that will be modified
     const [loading, setLoading] = useState(false)
     const [selectedDate, setSelectedDate] = useState(new Date());
+    const [addedColorToProjects, setAddedColorToProjects] = useState(false)
+    useEffect(()=>{
+        console.log("errorosm")
+        projects.forEach(el=>{
+            el['color'] = getColor(el.due_date)
+        })
+        console.log(projects)
+        setAddedColorToProjects(true)
 
-
+    },[])
     const handleLogoutButtonPressed = () => {
         axios.delete("http://localhost:3000/logout", { withCredentials: true }).then(response => {
             props.handleLogout()
@@ -348,7 +382,9 @@ export default function Workspace(props) {
             due_date: date
         }).then(response => {
             console.log(response.data)
-            projects.push(response.data)
+            const new_guy = response.data
+            new_guy['color'] = getColor(new_guy.due_date)
+            projects.push(new_guy)
             setProjectTitle('')
             setOpenNewProjectD(false)
         }).catch(error => {
@@ -364,14 +400,23 @@ export default function Workspace(props) {
             projects.forEach(el => {
                 if (el.id === currentViewingProject.id) {
                     el['name'] = projectTitle
+                    el['color'] = getColor(date)
                 }
             })
+            console.log("shit")
             // projects[currentViewingProject.id]['name'] = projectTitle
             currentViewingProject.name = projectTitle
+            console.log("1")
             currentViewingProject['due_date'] = date
+            console.log("12")
             currentViewingProject['pretty_date'] = getPrettyDate(date)
-            currentViewingProject['color'] = getcolor(date)
+            console.log("1")
+            console.log(getColor(date))
+            currentViewingProject['color'] = getColor(date)
+            
+            console.log("1")
             setProjectTitle('')
+            console.log("fuck")
             setOpenNewProjectD(false)
             //async update projects after fetching the server
         }).catch(error => {
@@ -392,6 +437,7 @@ export default function Workspace(props) {
         } else {//Edit 
             if (projectTitle !== '') {
                 putProject(newDate)
+                console.log("here bitch")
             }
         }
     };
@@ -556,28 +602,7 @@ export default function Workspace(props) {
         return `${day}-${prettyDates[month]}-${year}`
     }
 
-    const getColor = (date)=>{
-        const splitted = date.split("-")
-        const day = parseInt(splitted[0])
-        const month = parseInt(splitted[1]) - 1
-        const year = parseInt(splitted[2])
-        const dateT = new Date(year, month, day).setHours(0,0,0,0)
-        const today = new Date().setHours(0,0,0,0)
-        const difference = parseInt((dateT - today)/(24*3600*1000))
-        let color = ""
     
-        console.log(difference)
-        if (dateT < today){
-            color = "gray"
-        }else if (difference <= 1){
-            color = "red"
-        }else if (difference< 7){
-            color = "yellow"
-        }else if (difference >= 7){
-            color = "green"
-        }
-        return color
-    }
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
@@ -627,9 +652,10 @@ export default function Workspace(props) {
                 <Divider />
                 {loading && <StyledLinearProgress  />}
                 <List>
-                    {projects.map(proj => {
+                    {addedColorToProjects && projects.map(proj => {
                         return (
-                            <ListItem button onClick={() => showProject(proj.id)} key={proj.id}>
+                            <ListItem button onClick={() => showProject(proj.id)} key={proj.id} style={{ 
+                                border: `3px solid ${color[proj.color]}` }}>
                                 <ListItemText primary={proj.name} />
                                 <ListItemSecondaryAction onClick={() => handleOpenDeleteProject(proj.id)}>
                                     <IconButton edge="end" aria-label="delete">
@@ -655,7 +681,8 @@ export default function Workspace(props) {
                         <Grid item xs={11}  >
 
                             <Typography variant="h3" >{currentViewingProject.name}</Typography>
-                            <Typography variant="subtitle1" >{currentViewingProject.pretty_date}</Typography>
+                            {/* <Typography variant="subtitle1" >{currentViewingProject.pretty_date}</Typography> */}
+                            <h3 style={{marginTop: "4px", marginBotton: "0px", color:color[currentViewingProject.color] }}>{currentViewingProject.pretty_date}</h3>
                         </Grid>
 
                         <Grid item container xs={1} >
