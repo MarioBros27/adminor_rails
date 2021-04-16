@@ -14,6 +14,12 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button'
 
+const color ={
+    red:"#f50057",
+    yellow:"#999900",
+    green:"#52b202",
+    gray:"#add8e6"
+}
 const StyledButton = withStyles({
     root: {
         width: '100%',
@@ -50,7 +56,7 @@ export default function CheckboxList(props) {
                 
                 return (
                     <ListItem key={value} role={undefined} dense style={{ 
-                        border: '1px solid #999900' }}>
+                        border: `1px solid ${color[task.color]}` }}>
 
                         <ListItemIcon>
 
@@ -71,7 +77,7 @@ export default function CheckboxList(props) {
                             </Grid>
                             <Divider orientation="vertical" flexItem style={{ marginRight: "-1px" }} />
                             <Grid item container md={2} xs={12} justify="center">
-                                {task.pretty_date}
+                                <p style={{color:color[task.color]}}>{task.pretty_date}</p>
 
                             </Grid>
                         </Grid>

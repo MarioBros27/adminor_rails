@@ -32,7 +32,6 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import TasksList from './TasksList'
 import DatePicker from './DatePicker'
 import axios from 'axios'
-import CircularProgress from '@material-ui/core/CircularProgress';
 import LinearProgress from '@material-ui/core/LinearProgress';
 
 const drawerWidth = 240;
@@ -43,12 +42,6 @@ let editingTask = false
 
 let prettyDates = ['', 'ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DEC']
 
-const StyledCircularProgress = withStyles({
-    root: {
-        color: green[500],
-
-    }
-})(CircularProgress);
 const StyledLinearProgress = withStyles({
     root: {
         color: '52b202',
@@ -377,6 +370,7 @@ export default function Workspace(props) {
             currentViewingProject.name = projectTitle
             currentViewingProject['due_date'] = date
             currentViewingProject['pretty_date'] = getPrettyDate(date)
+            currentViewingProject['color'] = getcolor(date)
             setProjectTitle('')
             setOpenNewProjectD(false)
             //async update projects after fetching the server
@@ -440,7 +434,7 @@ export default function Workspace(props) {
             const new_guy = response.data
             console.log(new_guy)
             new_guy['pretty_date'] = getPrettyDate(new_guy['due_date'])
-
+            new_guy['color'] = getColor(new_guy['due_date'])
             notDone.push(new_guy)
             setTaskTitle('')
             setOpenNewTaskD(false)
@@ -462,6 +456,7 @@ export default function Workspace(props) {
             const new_guy = response.data
             console.log(new_guy)
             new_guy['pretty_date'] = getPrettyDate(new_guy['due_date'])
+            new_guy['color'] = getColor(new_guy['due_date'])
             console.log(new_guy['pretty_date'])
             if (currentTask.done) {
                 let newList = []
@@ -537,15 +532,16 @@ export default function Workspace(props) {
             const notDoneT = response.data.tasks.filter(el => el.done === false)
             doneT.forEach(el => {
                 el["pretty_date"] = getPrettyDate(el.due_date)
+                el["color"] = getColor(el.due_date)
             })
             notDoneT.forEach(el => {
                 el["pretty_date"] = getPrettyDate(el.due_date)
+                el["color"] = getColor(el.due_date)
             })
             setDone(doneT)
             setNotDone(notDoneT)
-            // const pretty = getPrettyDate(proj.due_date)
-            // console.log("pretty",pretty)
             proj["pretty_date"] = getPrettyDate(proj.due_date)
+            proj["color"] = getColor(proj.due_date)
             //Set project but remove the tickets to optimize memory use
             delete proj.tasks
             setCurrentViewingProject(proj)
@@ -558,6 +554,29 @@ export default function Workspace(props) {
         var month = parseInt(splitted[1])
         var year = parseInt(splitted[2])
         return `${day}-${prettyDates[month]}-${year}`
+    }
+
+    const getColor = (date)=>{
+        const splitted = date.split("-")
+        const day = parseInt(splitted[0])
+        const month = parseInt(splitted[1]) - 1
+        const year = parseInt(splitted[2])
+        const dateT = new Date(year, month, day).setHours(0,0,0,0)
+        const today = new Date().setHours(0,0,0,0)
+        const difference = parseInt((dateT - today)/(24*3600*1000))
+        let color = ""
+    
+        console.log(difference)
+        if (dateT < today){
+            color = "gray"
+        }else if (difference <= 1){
+            color = "red"
+        }else if (difference< 7){
+            color = "yellow"
+        }else if (difference >= 7){
+            color = "green"
+        }
+        return color
     }
     return (
         <ThemeProvider theme={theme}>
