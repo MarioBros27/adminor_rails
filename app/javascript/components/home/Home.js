@@ -6,12 +6,8 @@ import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button'
-
 import Hidden from '@material-ui/core/Hidden';
 import GoogleLogin from 'react-google-login';
-
-
-
 import { Typography } from '@material-ui/core';
 import axios from 'axios'
 
@@ -146,7 +142,6 @@ export default function Home(props) {
         },
             { withCredentials: true }
         ).then(response => {
-            console.log("response from google log in, existing", reponse)
             if (response.data.logged_in) {
                 handleSuccesfulAuth(response.data)
             }

@@ -319,8 +319,8 @@ export default function Workspace(props) {
 
             //Pushing
             doneTemp.push(actuallyToBeTransfered)
-            //TODO: Sort them by date
-
+            //Sort them by date
+            doneTemp = sortArray(doneTemp)
             //Deleting from previous list
             notDoneTemp = notDoneTemp.filter(el => el.id !== id)
         } else {
@@ -332,7 +332,9 @@ export default function Workspace(props) {
             // console.log(actuallyToBeTransfered[0].value)
             // //Pushing
             notDoneTemp.push(actuallyToBeTransfered)
-            // //Deleting from previous list
+            //Sort them by date
+            notDoneTemp = sortArray(notDoneTemp)
+            //Deleting from previous list
             doneTemp = doneTemp.filter(el => el.id !== id)
         }
         setDone(doneTemp)
@@ -425,10 +427,16 @@ export default function Workspace(props) {
             projects.forEach(el => {
                 if (el.id === currentViewingProject.id) {
                     el['name'] = projectTitle
+                    el['due_date'] = date
                     el['color'] = getColor(date)
                 }
             })
+            // setProjects(sortArray(projects))
+            setAddedColorToProjects(true)
+            console.log(addedColorToProjects)
             setProjects(sortArray(projects))
+
+            console.log(projects)
             console.log("shit")
             // projects[currentViewingProject.id]['name'] = projectTitle
             currentViewingProject.name = projectTitle
@@ -671,8 +679,6 @@ export default function Workspace(props) {
                 }}
             >
                 <div className={classes.drawerHeader}>
-
-
                     {
                         isLaptop === false &&
                         <IconButton onClick={handleDrawerClose}>
@@ -685,7 +691,8 @@ export default function Workspace(props) {
                 {loading && <StyledLinearProgress  />}
                 <List>
                     {addedColorToProjects && projects.map(proj => {
-                        return (
+                       console.log("hallelujah")
+                       return (
                             <ListItem button onClick={() => showProject(proj.id)} key={proj.id} style={{ 
                                 border: `3px solid ${color[proj.color]}` }}>
                                 <ListItemText primary={proj.name} />
