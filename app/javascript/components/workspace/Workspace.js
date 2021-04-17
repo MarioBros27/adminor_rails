@@ -47,6 +47,29 @@ const color ={
     green:"#52b202",
     gray:"#add8e6"
 }
+const sortArray = (lista) => {
+    
+    const today = new Date().setHours(0, 0, 0, 0)
+    let sortedByDate = []
+    let sortedByName = []
+    lista.forEach(el => {
+        const splitted = el['due_date'].split("-")
+        const day = parseInt(splitted[0])
+        const month = parseInt(splitted[1]) - 1
+        const year = parseInt(splitted[2])
+        const dateT = new Date(year, month, day).setHours(0, 0, 0, 0)
+        if (dateT < today) {//It's in the past
+            sortedByName.push(el)
+        }else{
+            el['date'] = dateT
+            sortedByDate.push(el)
+        }
+    })
+    sortedByDate.sort((a, b) => a.date - b.date)
+    sortedByName.sort( (a, b) => a.name.localeCompare(b.name, 'es', {ignorePunctuation: true}));
+
+    return(sortedByDate.concat(sortedByName))
+}
 const getColor = (date)=>{
     const splitted = date.split("-")
     const day = parseInt(splitted[0])
@@ -257,7 +280,8 @@ export default function Workspace(props) {
         projects.forEach(el=>{
             el['color'] = getColor(el.due_date)
         })
-        console.log(projects)
+        setProjects(sortArray(projects))
+        // console.log(projects)
         setAddedColorToProjects(true)
 
     },[])
@@ -385,6 +409,7 @@ export default function Workspace(props) {
             const new_guy = response.data
             new_guy['color'] = getColor(new_guy.due_date)
             projects.push(new_guy)
+            setProjects(sortArray(projects))
             setProjectTitle('')
             setOpenNewProjectD(false)
         }).catch(error => {
@@ -403,6 +428,7 @@ export default function Workspace(props) {
                     el['color'] = getColor(date)
                 }
             })
+            setProjects(sortArray(projects))
             console.log("shit")
             // projects[currentViewingProject.id]['name'] = projectTitle
             currentViewingProject.name = projectTitle
@@ -482,6 +508,8 @@ export default function Workspace(props) {
             new_guy['pretty_date'] = getPrettyDate(new_guy['due_date'])
             new_guy['color'] = getColor(new_guy['due_date'])
             notDone.push(new_guy)
+            setNotDone(sortArray(notDone))
+
             setTaskTitle('')
             setOpenNewTaskD(false)
         }).catch(error => {
@@ -515,7 +543,9 @@ export default function Workspace(props) {
                     }
                 })
 
-                setDone(newList)
+                // setDone(newList)
+                setDone(sortArray(newList))
+
             } else {
                 let newList = []
                 notDone.forEach(el => {
@@ -527,7 +557,8 @@ export default function Workspace(props) {
                     }
                 })
                 console.log("newlist", newList)
-                setNotDone(newList)
+                // setNotDone(newList)
+                setNotDone(sortArray(newList))
             }
             setTaskTitle('')
             setOpenNewTaskD(false)
@@ -584,8 +615,9 @@ export default function Workspace(props) {
                 el["pretty_date"] = getPrettyDate(el.due_date)
                 el["color"] = getColor(el.due_date)
             })
-            setDone(doneT)
-            setNotDone(notDoneT)
+            // setDone(doneT)
+            setDone(sortArray(doneT))
+            setNotDone(sortArray(notDoneT))
             proj["pretty_date"] = getPrettyDate(proj.due_date)
             proj["color"] = getColor(proj.due_date)
             //Set project but remove the tickets to optimize memory use
