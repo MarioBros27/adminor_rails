@@ -273,6 +273,7 @@ export default function Workspace(props) {
     const [currentViewingProject, setCurrentViewingProject] = useState({})//Selected viewing project object
     const [currentTask, setCurrentTask] = useState({})//Selected task object that will be modified
     const [loading, setLoading] = useState(false)
+    const [loadingPopup, setLoadingPopup] = useState(false)
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [addedColorToProjects, setAddedColorToProjects] = useState(false)
     useEffect(()=>{
@@ -374,12 +375,15 @@ export default function Workspace(props) {
         setDeleteProject(false);
     };
     const handleDeleteProject = () => {
+        setLoading(true)
         const url = `http://localhost:3000/projects/${projectToDelete}`
         axios.delete(url).then(response => {
             setDeleteProject(false);
             setProjects(projects.filter(el => el.id !== projectToDelete))
+            setLoading(false)
             // console.log(projectToDelete)
         }).catch(error => {
+            setLoading(false)
             console.log(error)
         })
 
@@ -398,6 +402,7 @@ export default function Workspace(props) {
     };
     const postProject = (date) => {
         console.log(date)
+        setLoadingPopup(true)
         var name = projectTitle
         if (projectTitle === '') {
             name = 'No name'
@@ -414,12 +419,15 @@ export default function Workspace(props) {
             setProjects(sortArray(projects))
             setProjectTitle('')
             setOpenNewProjectD(false)
+            setLoadingPopup(false)
         }).catch(error => {
+            setLoadingPopup(false)
             return -1
         })
     }
     const putProject = (date) => {
         const url = `http://localhost:3000/projects/${currentViewingProject.id}`
+        setLoadingPopup(true)
         axios.put(url, {
             name: projectTitle,
             due_date: date
@@ -430,6 +438,7 @@ export default function Workspace(props) {
                     el['due_date'] = date
                     el['color'] = getColor(date)
                 }
+                
             })
             // setProjects(sortArray(projects))
             setAddedColorToProjects(true)
@@ -452,8 +461,10 @@ export default function Workspace(props) {
             setProjectTitle('')
             console.log("fuck")
             setOpenNewProjectD(false)
+            setLoadingPopup(false)
             //async update projects after fetching the server
         }).catch(error => {
+            setLoadingPopup(false)
             return -1
         })
     }
@@ -502,6 +513,7 @@ export default function Workspace(props) {
     };
     const postTask = (date) => {
         var name = taskTitle
+        setLoadingPopup(true)
         if (taskTitle === '') {
             name = 'Nada'
         }
@@ -520,7 +532,9 @@ export default function Workspace(props) {
 
             setTaskTitle('')
             setOpenNewTaskD(false)
+            setLoadingPopup(false)
         }).catch(error => {
+            setLoadingPopup(false)
             return -1
         })
     }
@@ -529,6 +543,7 @@ export default function Workspace(props) {
         if (taskTitle === '') {
             name = 'Nada'
         }
+        setLoadingPopup(true)
         axios.put(`http://localhost:3000/tasks/${currentTask.id}`, {
             name: name,
             due_date: date
@@ -570,7 +585,11 @@ export default function Workspace(props) {
             }
             setTaskTitle('')
             setOpenNewTaskD(false)
+            setLoadingPopup(false)
+
         }).catch(error => {
+            setLoadingPopup(false)
+
             return -1
         })
     }
@@ -782,6 +801,8 @@ export default function Workspace(props) {
                 onClose={handleCloseNewProject}
             >
                 <DialogContent>
+                {loadingPopup && <StyledLinearProgress  />}
+
                     <TextField
                         id="title-project-name"
                         label="Project name"
