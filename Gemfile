@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.6.3'
+ruby '2.7.3'
 ###TODO disable this shit before production
 # gem 'rack-cors'
 #IMMPORRRTANT TO ADD BCRYPT FOR ENCRYPTING PASSWORDS
