@@ -150,6 +150,7 @@ export default function Home(props) {
                 handleSuccesfulAuth(response.data)
             }
         }).catch(error => {
+            console.log("error", error)
             if (error.response.status === 404) { ///THen create the account
                 axios.post(`${url}/registrations`, {
                     user: {
