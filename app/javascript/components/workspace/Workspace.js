@@ -357,8 +357,8 @@ export default function Workspace(props) {
         setDeleteTask(false);
     };
     const handleDeleteTask = () => {
-        const url = `${url}/tasks/${taskToDelete}`
-        axios.delete(url).then(response => {
+        const urlo = `${url}/tasks/${taskToDelete}`
+        axios.delete(urlo).then(response => {
             //Delete from wherever it is try not done and done
             setNotDone(notDone.filter(el => el.id !== taskToDelete))
             setDone(done.filter(el => el.id !== taskToDelete))
@@ -379,8 +379,8 @@ export default function Workspace(props) {
     };
     const handleDeleteProject = () => {
         setLoading(true)
-        const url = `${url}/projects/${projectToDelete}`
-        axios.delete(url).then(response => {
+        const urlo = `${url}/projects/${projectToDelete}`
+        axios.delete(urlo).then(response => {
             setDeleteProject(false);
             setProjects(projects.filter(el => el.id !== projectToDelete))
             setLoading(false)
@@ -429,9 +429,9 @@ export default function Workspace(props) {
         })
     }
     const putProject = (date) => {
-        const url = `${url}/projects/${currentViewingProject.id}`
+        const urlo = `${url}/projects/${currentViewingProject.id}`
         setLoadingPopup(true)
-        axios.put(url, {
+        axios.put(urlo, {
             name: projectTitle,
             due_date: date
         }).then(response => {
