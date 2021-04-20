@@ -6,6 +6,10 @@ import Home from './components/home/Home'
 import Workspace from './components/workspace/Workspace'
 import Error from './components/Error'
 import axios from 'axios'
+const dev = "http://localhost:3000"
+const prod = "https://adminor.herokuapp.com"
+const url = prod
+
 export default function App(props) {
     const [loggedIn, setLoggedIn] = useState(false)
     const [user, setUser] = useState({})
@@ -21,7 +25,7 @@ export default function App(props) {
     }
 
     const checkLoginStatus = () => {
-        axios.get("http://localhost:3000/logged_in", { witchCredentials: true }).then(response => {
+        axios.get(`${url}/logged_in`, { witchCredentials: true }).then(response => {
             if (response.data.logged_in && !loggedIn) {
                 console.log(response.data.user)
                 setUser(response.data.user)
