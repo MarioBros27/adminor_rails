@@ -631,8 +631,8 @@ export default function Workspace(props) {
         //Fetch it's tasks by calling project from the api
         //TODO tasks
         setLoading(true)
-        const url = `${url}/projects/${id}`
-        axios.get(url).then(response => {
+        const urlo = `${url}/projects/${id}`
+        axios.get(urlo).then(response => {
             const proj = response.data
             //Set tickets
             const doneT = response.data.tasks.filter(el => el.done === true)
@@ -803,8 +803,9 @@ export default function Workspace(props) {
                 open={openNewProjectD}
                 onClose={handleCloseNewProject}
             >
-                <DialogContent>
                 {loadingPopup && <StyledLinearProgress  />}
+                <DialogContent>
+                
 
                     <TextField
                         id="title-project-name"
@@ -832,6 +833,7 @@ export default function Workspace(props) {
                 open={openNewTaskD}
                 onClose={handleCloseNewTask}
             >
+                {loadingPopup && <StyledLinearProgress  />}
                 <DialogContent>
                     <TextField
                         id="title-task-name"
