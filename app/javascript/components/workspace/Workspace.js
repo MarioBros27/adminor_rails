@@ -39,8 +39,8 @@ let taskToDelete = -1
 let projectToDelete = -1
 let editingProject = false
 let editingTask = false
-const dev = "localhost:3000"
-const prod = "adminor.herokuapp.com"
+const dev = "http://localhost:3000"
+const prod = "https://adminor.herokuapp.com"
 const url = prod
 
 let prettyDates = ['', 'ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DEC']
@@ -290,7 +290,7 @@ export default function Workspace(props) {
 
     },[])
     const handleLogoutButtonPressed = () => {
-        axios.delete(`http://${url}/logout`, { withCredentials: true }).then(response => {
+        axios.delete(`${url}/logout`, { withCredentials: true }).then(response => {
             props.handleLogout()
         })
 
@@ -302,7 +302,7 @@ export default function Workspace(props) {
         var notDoneTemp = notDone
         const doneBackup = done
         const notDoneBackup = notDone
-        axios.put(`http://${url}/tasks/${id}`, {
+        axios.put(`${url}/tasks/${id}`, {
             done: value
         }).then(response => {
 
@@ -357,7 +357,7 @@ export default function Workspace(props) {
         setDeleteTask(false);
     };
     const handleDeleteTask = () => {
-        const url = `http://${url}/tasks/${taskToDelete}`
+        const url = `${url}/tasks/${taskToDelete}`
         axios.delete(url).then(response => {
             //Delete from wherever it is try not done and done
             setNotDone(notDone.filter(el => el.id !== taskToDelete))
@@ -379,7 +379,7 @@ export default function Workspace(props) {
     };
     const handleDeleteProject = () => {
         setLoading(true)
-        const url = `http://${url}/projects/${projectToDelete}`
+        const url = `${url}/projects/${projectToDelete}`
         axios.delete(url).then(response => {
             setDeleteProject(false);
             setProjects(projects.filter(el => el.id !== projectToDelete))
@@ -410,7 +410,7 @@ export default function Workspace(props) {
         if (projectTitle === '') {
             name = 'No name'
         }
-        axios.post(`http://${url}/projects`, {
+        axios.post(`${url}/projects`, {
             name: name,
             user_id: props.user.id,
             due_date: date
@@ -429,7 +429,7 @@ export default function Workspace(props) {
         })
     }
     const putProject = (date) => {
-        const url = `http://${url}/projects/${currentViewingProject.id}`
+        const url = `${url}/projects/${currentViewingProject.id}`
         setLoadingPopup(true)
         axios.put(url, {
             name: projectTitle,
@@ -520,7 +520,7 @@ export default function Workspace(props) {
         if (taskTitle === '') {
             name = 'Nada'
         }
-        axios.post(`http://${url}/tasks`, {
+        axios.post(`${url}/tasks`, {
             name: name,
             project_id: currentViewingProject.id,
             due_date: date,
@@ -547,7 +547,7 @@ export default function Workspace(props) {
             name = 'Nada'
         }
         setLoadingPopup(true)
-        axios.put(`http://${url}/tasks/${currentTask.id}`, {
+        axios.put(`${url}/tasks/${currentTask.id}`, {
             name: name,
             due_date: date
         }).then(response => {
@@ -631,7 +631,7 @@ export default function Workspace(props) {
         //Fetch it's tasks by calling project from the api
         //TODO tasks
         setLoading(true)
-        const url = `http://${url}/projects/${id}`
+        const url = `${url}/projects/${id}`
         axios.get(url).then(response => {
             const proj = response.data
             //Set tickets
