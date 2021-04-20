@@ -280,7 +280,7 @@ export default function Workspace(props) {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [addedColorToProjects, setAddedColorToProjects] = useState(false)
     useEffect(()=>{
-        console.log("errorosm")
+        // console.log("errorosm")
         projects.forEach(el=>{
             el['color'] = getColor(el.due_date)
         })
@@ -350,7 +350,7 @@ export default function Workspace(props) {
     const handleOpenDeleteTask = function (id) {
         setDeleteTask(true);
         taskToDelete = id
-        console.log(taskToDelete)
+        // console.log(taskToDelete)
     };
 
     const handleCloseDeleteTask = () => {
@@ -387,7 +387,7 @@ export default function Workspace(props) {
             // console.log(projectToDelete)
         }).catch(error => {
             setLoading(false)
-            console.log(error)
+            // console.log(error)
         })
 
     };
@@ -404,7 +404,7 @@ export default function Workspace(props) {
         setProjectTitle('')
     };
     const postProject = (date) => {
-        console.log(date)
+        // console.log(date)
         setLoadingPopup(true)
         var name = projectTitle
         if (projectTitle === '') {
@@ -415,7 +415,7 @@ export default function Workspace(props) {
             user_id: props.user.id,
             due_date: date
         }).then(response => {
-            console.log(response.data)
+            // console.log(response.data)
             const new_guy = response.data
             new_guy['color'] = getColor(new_guy.due_date)
             projects.push(new_guy)
@@ -445,24 +445,17 @@ export default function Workspace(props) {
             })
             // setProjects(sortArray(projects))
             setAddedColorToProjects(true)
-            console.log(addedColorToProjects)
+            // console.log(addedColorToProjects)
             setProjects(sortArray(projects))
 
-            console.log(projects)
-            console.log("shit")
+            // console.log(projects)
             // projects[currentViewingProject.id]['name'] = projectTitle
             currentViewingProject.name = projectTitle
-            console.log("1")
             currentViewingProject['due_date'] = date
-            console.log("12")
             currentViewingProject['pretty_date'] = getPrettyDate(date)
-            console.log("1")
-            console.log(getColor(date))
             currentViewingProject['color'] = getColor(date)
             
-            console.log("1")
             setProjectTitle('')
-            console.log("fuck")
             setOpenNewProjectD(false)
             setLoadingPopup(false)
             //async update projects after fetching the server
@@ -473,19 +466,18 @@ export default function Workspace(props) {
     }
     ///Save new or edited project
     const handleSaveNewProject = () => {
-        console.log(selectedDate)
+        // console.log(selectedDate)
         var date = selectedDate.getDate().toString()
         var month = (selectedDate.getMonth() + 1).toString()
         var year = selectedDate.getFullYear().toString()
         var newDate = `${date}-${month}-${year}`
-        console.log(newDate)
+        // console.log(newDate)
         if (!editingProject) {//Post new
             postProject(newDate)
 
         } else {//Edit 
             if (projectTitle !== '') {
                 putProject(newDate)
-                console.log("here bitch")
             }
         }
     };
@@ -498,7 +490,7 @@ export default function Workspace(props) {
         var year = parseInt(splitted[2])
         var date = new Date(year, month, day)
         // var date = format(new Date(year, month, day), 'yyyy-MM-dd')
-        console.log(date)
+        // console.log(date)
         setSelectedDate(date)
         setProjectTitle(currentViewingProject.name)
         setOpenNewProjectD(true)
@@ -527,7 +519,7 @@ export default function Workspace(props) {
             done: false
         }).then(response => {
             const new_guy = response.data
-            console.log(new_guy)
+            // console.log(new_guy)
             new_guy['pretty_date'] = getPrettyDate(new_guy['due_date'])
             new_guy['color'] = getColor(new_guy['due_date'])
             notDone.push(new_guy)
@@ -551,13 +543,13 @@ export default function Workspace(props) {
             name: name,
             due_date: date
         }).then(response => {
-            console.log("made it here", currentTask)
-            console.log(currentTask.done)
+            // console.log("made it here", currentTask)
+            // console.log(currentTask.done)
             const new_guy = response.data
-            console.log(new_guy)
+            // console.log(new_guy)
             new_guy['pretty_date'] = getPrettyDate(new_guy['due_date'])
             new_guy['color'] = getColor(new_guy['due_date'])
-            console.log(new_guy['pretty_date'])
+            // console.log(new_guy['pretty_date'])
             if (currentTask.done) {
                 let newList = []
                 done.forEach(el => {
@@ -582,7 +574,7 @@ export default function Workspace(props) {
                         newList.push(el)
                     }
                 })
-                console.log("newlist", newList)
+                // console.log("newlist", newList)
                 // setNotDone(newList)
                 setNotDone(sortArray(newList))
             }
@@ -598,12 +590,12 @@ export default function Workspace(props) {
     }
     //Saving new or editing a task
     const handleSaveNewTask = () => {
-        console.log(selectedDate)
+        // console.log(selectedDate)
         var date = selectedDate.getDate().toString()
         var month = (selectedDate.getMonth() + 1).toString()
         var year = selectedDate.getFullYear().toString()
         var newDate = `${date}-${month}-${year}`
-        console.log(newDate)
+        // console.log(newDate)
         if (!editingTask) {
             postTask(newDate)
         } else {
@@ -620,7 +612,7 @@ export default function Workspace(props) {
         var year = parseInt(splitted[2])
         var date = new Date(year, month, day)
         // var date = format(new Date(year, month, day), 'yyyy-MM-dd')
-        console.log(date)
+        // console.log(date)
         setSelectedDate(date)
         setCurrentTask(task)
         setTaskTitle(task.name)
@@ -713,7 +705,7 @@ export default function Workspace(props) {
                 {loading && <StyledLinearProgress  />}
                 <List>
                     {addedColorToProjects && projects.map(proj => {
-                       console.log("hallelujah")
+                    //    console.log("hallelujah")
                        return (
                             <ListItem button onClick={() => showProject(proj.id)} key={proj.id} style={{ 
                                 border: `3px solid ${color[proj.color]}` }}>

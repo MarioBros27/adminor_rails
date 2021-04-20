@@ -145,7 +145,7 @@ export default function Home(props) {
         },
             { withCredentials: true }
         ).then(response => {
-            console.log("la respuesta fue", response)
+            // console.log("la respuesta fue", response)
             if (response.data.logged_in) {
                 handleSuccesfulAuth(response.data)
             }
@@ -159,13 +159,13 @@ export default function Home(props) {
                 },
                     { withCredentials: true }
                 ).then(response => {
-                    console.log("response 2", response)
+                    // console.log("response 2", response)
                     if (response.data.status === "created") {
 
                         handleSuccesfulAuth(response.data)
                     }
                 }).catch(error => {
-                    console.log("fuck me")
+                    // console.log("fatal error")
                     setError("Something went wrong while trying to sign in with Google, try again")
                 })
             } else {//something else happened and tell user to check something else

@@ -12,9 +12,9 @@ export default function DatePicker(props) {
     const [selectedDate, setSelectedDate] = useState(props.selectedDateIn);
 
     const handleDateChange = (date) => {
-        console.log(date.getDate())
-        console.log(date.getMonth() + 1)
-        console.log(date.getFullYear())
+        // console.log(date.getDate())
+        // console.log(date.getMonth() + 1)
+        // console.log(date.getFullYear())
         setSelectedDate(date);
         props.setSelectedDate(date)
     };
