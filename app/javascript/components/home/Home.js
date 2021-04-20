@@ -145,6 +145,7 @@ export default function Home(props) {
         },
             { withCredentials: true }
         ).then(response => {
+            console.log("la respuesta fue", response)
             if (response.data.logged_in) {
                 handleSuccesfulAuth(response.data)
             }
@@ -158,6 +159,7 @@ export default function Home(props) {
                 },
                     { withCredentials: true }
                 ).then(response => {
+                    console.log("response 2", response)
                     if (response.data.status === "created") {
 
                         handleSuccesfulAuth(response.data)
