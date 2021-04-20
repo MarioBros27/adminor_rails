@@ -2,13 +2,12 @@ default: &default
   adapter: postgresql
   encoding: unicode
   # DEV VARIABLES
-  # host: db
-  username: postgres
-  password: astrid
+  # username: postgres
+  # password: astrid
   # PRODUCTION VARIABLES
-  # host: ec2-100-25-231-126.compute-1.amazonaws.com
-  # username: qgppckwqgntipt
-  # password: 36c32ce5ac7e11f5c3936dbc175234578c3156cd7855dc26314427661d3eed69
+  host: ec2-54-224-120-186.compute-1.amazonaws.com
+  username: yookxllzyzufoc
+  password: 70bbe9b63cc6c506f1a27aa56897e73e0da47c11167ff410fabc367c03f279ea
   pool: 5
 
 development:
@@ -22,6 +21,6 @@ test:
   <<: *default
   database: rails_test
 
-# production:
-#   <<: *default
-#   database: dcnc7ct91g9tqd
+production:
+  <<: *default
+  database: dv4ntafnevktr

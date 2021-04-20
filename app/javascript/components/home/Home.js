@@ -11,6 +11,9 @@ import GoogleLogin from 'react-google-login';
 import { Typography } from '@material-ui/core';
 import axios from 'axios'
 
+const dev = "localhost:3000"
+const prod = "adminor.herokuapp.com"
+const url = prod
 
 const LogInButton = withStyles({
     root: {
@@ -87,7 +90,7 @@ export default function Home(props) {
             setError("Passwords don't match")
             return
         }
-        axios.post('http://localhost:3000/registrations', {
+        axios.post(`http://${url}/registrations`, {
             user: {
                 email: email,
                 password: password,
@@ -116,7 +119,7 @@ export default function Home(props) {
             setError("please enter a password")
             return
         }
-        axios.post('http://localhost:3000/sessions', {
+        axios.post(`http://${url}/sessions`, {
             user: {
                 email: email,
                 password: password
@@ -134,7 +137,7 @@ export default function Home(props) {
     const handleGoogleLogin = (data) => {
         const email = data.profileObj.email
 
-        axios.post('http://localhost:3000/sessions', {
+        axios.post(`http://${url}/sessions`, {
             user: {
                 email: email,
                 is_google: true
@@ -147,7 +150,7 @@ export default function Home(props) {
             }
         }).catch(error => {
             if (error.response.status === 404) { ///THen create the account
-                axios.post('http://localhost:3000/registrations', {
+                axios.post(`http://${url}/registrations`, {
                     user: {
                         email: email,
                         is_google: true
