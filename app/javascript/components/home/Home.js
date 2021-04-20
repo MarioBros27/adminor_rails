@@ -170,11 +170,13 @@ export default function Home(props) {
                     setError("Something went wrong while trying to sign in with Google, try again")
                 })
             } else {//something else happened and tell user to check something else
+                console.log("fell here")
                 setError("Ooops something went wrong, please try again or contact us")
             }
         })
     }
     const handleGoogleLogInFailure = ()=>{
+        console.log("google login failure")
         setError("Something failed while trying to sign in with Google, try again")
     }
 
