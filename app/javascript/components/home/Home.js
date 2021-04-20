@@ -145,12 +145,12 @@ export default function Home(props) {
         },
             { withCredentials: true }
         ).then(response => {
-            console.log("la respuesta fue", response)
+            //console.log("la respuesta fue", response)
             if (response.data.logged_in) {
                 handleSuccesfulAuth(response.data)
             }
         }).catch(error => {
-            console.log("error", error)
+            //console.log("error", error)
             if (error.response.status === 404) { ///THen create the account
                 axios.post(`${url}/registrations`, {
                     user: {
@@ -160,23 +160,23 @@ export default function Home(props) {
                 },
                     { withCredentials: true }
                 ).then(response => {
-                    console.log("response 2", response)
+                    //console.log("response 2", response)
                     if (response.data.status === "created") {
 
                         handleSuccesfulAuth(response.data)
                     }
                 }).catch(error => {
-                    console.log("fatal error")
+                    //console.log("fatal error")
                     setError("Something went wrong while trying to sign in with Google, try again")
                 })
             } else {//something else happened and tell user to check something else
-                console.log("fell here")
+                //console.log("fell here")
                 setError("Ooops something went wrong, please try again or contact us")
             }
         })
     }
     const handleGoogleLogInFailure = ()=>{
-        console.log("google login failure")
+        //console.log("google login failure")
         setError("Something failed while trying to sign in with Google, try again")
     }
 
